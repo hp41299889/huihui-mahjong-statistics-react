@@ -1,0 +1,32 @@
+#desk-form {
+    display: flex;
+    flex-direction: column;
+    border: 0.5px solid;
+    margin: 2%;
+    padding: 2%;
+}
+
+#desk-form .form-top {
+    display: flex;
+    justify-content: center;
+}
+
+#desk-form .form-middle-area {
+    display: flex;
+    justify-content: space-between;
+}
+
+#desk-form .form-middle-area .form-middle {
+    display: flex;
+}
+
+
+#desk-form .form-bottom {
+    display: flex;
+    justify-content: center;
+}
+
+#desk-form .form-button-area {
+    display: flex;
+    justify-content: end;
+}
