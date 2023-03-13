@@ -5,6 +5,7 @@ import WinningForm from "../components/RecordForm/WinningForm";
 import SelfDrawnForm from "../components/RecordForm/SelfDrawnForm";
 import DrawForm from "../components/RecordForm/DrawForm";
 import FakeForm from "../components/RecordForm/FakeForm";
+import PlayerList from "../components/RecordForm/PlayerList";
 import { EEndType, EWindLabel, EWind } from "../enum";
 
 interface IRecordForm {
@@ -29,11 +30,18 @@ const endTypeOptions: IEndType[] = [
     { label: '詐', value: EEndType.FAKE }
 ];
 
-const windList: EWindLabel[] = [
+const windLabelList: EWindLabel[] = [
     EWindLabel.EAST,
     EWindLabel.SOUTH,
     EWindLabel.WEST,
     EWindLabel.NORTH
+];
+
+const windList = [
+    EWind.EAST,
+    EWind.SOUTH,
+    EWind.WEST,
+    EWind.NORTH
 ];
 
 const Record: React.FC = () => {
@@ -41,8 +49,8 @@ const Record: React.FC = () => {
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
     const [circleNum, setCircleNum] = useState(0);
     const [roundNum, setRoundNum] = useState(0);
+    const [dealerNum, setDealerNum] = useState(0);
     const [dealerCount, setDealerCount] = useState(0);
-    const [] = useState();
 
     const renderForm = (endType: EEndType) => {
         switch (endType) {
@@ -67,36 +75,49 @@ const Record: React.FC = () => {
     const onChangeEndType = (e: RadioChangeEvent) => {
         setEndType(e.target.value);
     };
-    const dealerContinue = () => {
-        setDealerCount(preDealerCount => preDealerCount + 1);
+    const isDealerContinue = async (props: IRecordForm) => {
+        if (props.winner === props.dealer) {
+            return true;
+        };
+        if (props.endType === EEndType.DRAW) {
+            return true;
+        };
+        if (props.endType === EEndType.FAKE) {
+            return true;
+        }
+        return false;
     };
-    const onSubmit = (value: IRecordForm) => {
+    const onSubmit = async (value: IRecordForm) => {
+        value.endType = endType;
+        value.dealer = windList[dealerNum];
+        if (await isDealerContinue(value)) {
+            setDealerCount(preDealerCount => preDealerCount + 1);
+        } else {
+            if (roundNum === 3) {
+                setCircleNum(preCircleNum => preCircleNum + 1);
+                setDealerNum(0);
+                setRoundNum(0);
+            } else {
+                setRoundNum(preRoundNum => preRoundNum + 1);
+                setDealerNum(preDealerNum => preDealerNum + 1);
+                setDealerCount(0);
+            };
+        };
         console.log(value);
+    };
+
+    const renderPlayerList = (dealerNum: number) => {
+
     };
 
     return (
         <Layout>
             <Typography.Title className='title'>
-                {windList[circleNum]}風{windList[roundNum]}局
+                {windLabelList[circleNum]}風{windLabelList[roundNum]}局
             </Typography.Title>
             <Typography.Text className='dealer-count'>連莊:{dealerCount}</Typography.Text>
             <div className='player-list'>
-                <div className='player'>
-                    <Typography.Text className='wind'>東</Typography.Text>
-                    <Typography.Text className='player-name'>霖</Typography.Text>
-                </div>
-                <div className='player'>
-                    <Typography.Text className='wind'>南</Typography.Text>
-                    <Typography.Text className='player-name'>樺</Typography.Text>
-                </div>
-                <div className='player'>
-                    <Typography.Text className='wind dealer'>西</Typography.Text>
-                    <Typography.Text className='player-name dealer'>丁</Typography.Text>
-                </div>
-                <div className='player'>
-                    <Typography.Text className='wind'>北</Typography.Text>
-                    <Typography.Text className='player-name'>呆</Typography.Text>
-                </div>
+                <PlayerList />
             </div>
             <div className='endType-list'>
                 <Radio.Group
