@@ -1,0 +1,34 @@
+.title {
+    text-align: center;
+}
+
+.dealer-count {
+    display: flex;
+    justify-content: center;
+}
+
+.player-list {
+    display: flex;
+    justify-content: center;
+}
+
+.player-list .player {
+    display: flex;
+    flex-direction: column;
+}
+
+.endType-list {
+    display: flex;
+    justify-content: center;
+}
+
+.dealer {
+    color: red;
+}
+
+.record-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 0.5px solid;
+}
