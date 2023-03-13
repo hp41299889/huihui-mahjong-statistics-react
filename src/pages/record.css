@@ -17,13 +17,19 @@
     flex-direction: column;
 }
 
-.endType-list {
+.player-list .player.dealer {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    color: red;
 }
 
 .dealer {
     color: red;
+}
+
+.endType-list {
+    display: flex;
+    justify-content: center;
 }
 
 .record-form {

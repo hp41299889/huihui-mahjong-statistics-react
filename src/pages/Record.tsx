@@ -5,18 +5,9 @@ import WinningForm from "../components/RecordForm/WinningForm";
 import SelfDrawnForm from "../components/RecordForm/SelfDrawnForm";
 import DrawForm from "../components/RecordForm/DrawForm";
 import FakeForm from "../components/RecordForm/FakeForm";
-import PlayerList from "../components/RecordForm/PlayerList";
 import { EEndType, EWindLabel, EWind } from "../enum";
+import { IRecordForm } from "../interface";
 
-interface IRecordForm {
-    endType: EEndType;
-    winner: EWind;
-    loser: EWind | EWind[];
-    point: number;
-    dealer: EWind;
-    dealerCount: number;
-    circle: EWind;
-}
 
 interface IEndType {
     label: string;
@@ -107,7 +98,28 @@ const Record: React.FC = () => {
     };
 
     const renderPlayerList = (dealerNum: number) => {
-
+        return (
+            <>
+                {
+                    windList.map((item, index) => (
+                        <div
+                            className='player'
+                            key={`${item}_${index}`}
+                        >
+                            <Typography.Text
+                                className={`wind ${dealerNum === index ? 'dealer' : ''}`}>
+                                {windLabelList[index]}
+                            </Typography.Text>
+                            <Typography.Text
+                                className={`player-name ${dealerNum === index ? 'dealer' : ''}`}
+                            >
+                                霖
+                            </Typography.Text>
+                        </div>
+                    ))
+                }
+            </>
+        )
     };
 
     return (
@@ -117,7 +129,7 @@ const Record: React.FC = () => {
             </Typography.Title>
             <Typography.Text className='dealer-count'>連莊:{dealerCount}</Typography.Text>
             <div className='player-list'>
-                <PlayerList />
+                {renderPlayerList(dealerNum)}
             </div>
             <div className='endType-list'>
                 <Radio.Group

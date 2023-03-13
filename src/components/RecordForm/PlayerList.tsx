@@ -1,24 +1,42 @@
 import { Typography } from "antd";
+import { IRecordForm } from "../../interface";
+import { EWindLabel } from "../../enum";
+import './playerList.css';
 
-const PlayerList = () => {
+interface IPlayerList {
+    dealerNum: number;
+};
+
+const windList = [
+    'east',
+    'south',
+    'west',
+    'north'
+];
+
+const windLabelList: EWindLabel[] = [
+    EWindLabel.EAST,
+    EWindLabel.SOUTH,
+    EWindLabel.WEST,
+    EWindLabel.NORTH
+];
+
+const PlayerList = (props: IPlayerList) => {
+    const { dealerNum } = props;
+    const renderPlayerList = (dealerNum: number) => {
+        windList.forEach((value, index) => {
+            return (
+                <div className={`player ${dealerNum === index ? 'dealer' : ''}`}>
+                    <Typography.Text className='wind'>{windLabelList[index]}</Typography.Text>
+                    <Typography.Text className='player-name'>霖</Typography.Text>
+                </div>
+            )
+        });
+    };
+
     return (
         <>
-            <div className='player'>
-                <Typography.Text className='wind'>東</Typography.Text>
-                <Typography.Text className='player-name'>霖</Typography.Text>
-            </div>
-            <div className='player'>
-                <Typography.Text className='wind'>南</Typography.Text>
-                <Typography.Text className='player-name'>樺</Typography.Text>
-            </div>
-            <div className='player'>
-                <Typography.Text className='wind'>西</Typography.Text>
-                <Typography.Text className='player-name'>丁</Typography.Text>
-            </div>
-            <div className='player'>
-                <Typography.Text className='wind'>北</Typography.Text>
-                <Typography.Text className='player-name'>呆</Typography.Text>
-            </div>
+            {renderPlayerList(dealerNum)}
         </>
     )
 };
