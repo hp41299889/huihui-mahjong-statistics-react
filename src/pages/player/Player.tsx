@@ -1,6 +1,7 @@
 const Player = () => {
     return (
         <>
+            player
         </>
     )
 };

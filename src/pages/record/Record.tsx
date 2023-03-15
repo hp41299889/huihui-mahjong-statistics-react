@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Radio, RadioChangeEvent, Typography, Form, Button } from "antd";
 import './record.css';
-import WinningForm from "../components/RecordForm/WinningForm";
-import SelfDrawnForm from "../components/RecordForm/SelfDrawnForm";
-import DrawForm from "../components/RecordForm/DrawForm";
-import FakeForm from "../components/RecordForm/FakeForm";
-import { EEndType, EWindLabel, EWind } from "../enum";
-import { IRecordForm } from "../interface";
+import WinningForm from "./WinningForm";
+import SelfDrawnForm from "./SelfDrawnForm";
+import DrawForm from "./DrawForm";
+import FakeForm from "./FakeForm";
+import { EEndType, EWindLabel, EWind } from "../../enum";
+import { IRecordForm } from "../../interface";
 
 
 interface IEndType {
