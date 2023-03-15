@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Radio, RadioChangeEvent, Typography, Form, Button } from "antd";
+import axios from "axios";
 import './record.css';
 import WinningForm from "./WinningForm";
 import SelfDrawnForm from "./SelfDrawnForm";
@@ -11,7 +12,14 @@ import { IRecordForm } from "../../interface";
 
 interface IEndType {
     label: string;
-    value: EEndType
+    value: EEndType;
+};
+
+interface Iplayer {
+    id: number;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
 };
 
 const endTypeOptions: IEndType[] = [
@@ -38,10 +46,12 @@ const windList = [
 const Record: React.FC = () => {
 
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
-    const [circleNum, setCircleNum] = useState(0);
-    const [roundNum, setRoundNum] = useState(0);
-    const [dealerNum, setDealerNum] = useState(0);
-    const [dealerCount, setDealerCount] = useState(0);
+    const [circleNum, setCircleNum] = useState<number>(0);
+    const [roundNum, setRoundNum] = useState<number>(0);
+    const [dealerNum, setDealerNum] = useState<number>(0);
+    const [dealerCount, setDealerCount] = useState<number>(0);
+    const [roundId, setRoundId] = useState<string>('');
+    const [players, setPlayers] = useState<Iplayer[]>([]);
 
     const renderForm = (endType: EEndType) => {
         switch (endType) {
@@ -61,6 +71,19 @@ const Record: React.FC = () => {
                 return <FakeForm />
             }
         };
+    };
+
+    const renderPlayerList = (dealerNum: number) => {
+        console.log(players);
+        return (
+            <div>
+                {windList.map((item, index) => (
+                    <>
+                        {players[index].name && <span key={`${item}_${index}`}>{players[index].name}</span>}
+                    </>
+                ))}
+            </div>
+        )
     };
 
     const onChangeEndType = (e: RadioChangeEvent) => {
@@ -95,32 +118,21 @@ const Record: React.FC = () => {
             };
         };
         console.log(value);
+        console.log(players);
     };
 
-    const renderPlayerList = (dealerNum: number) => {
-        return (
-            <>
-                {
-                    windList.map((item, index) => (
-                        <div
-                            className='player'
-                            key={`${item}_${index}`}
-                        >
-                            <Typography.Text
-                                className={`wind ${dealerNum === index ? 'dealer' : ''}`}>
-                                {windLabelList[index]}
-                            </Typography.Text>
-                            <Typography.Text
-                                className={`player-name ${dealerNum === index ? 'dealer' : ''}`}
-                            >
-                                霖
-                            </Typography.Text>
-                        </div>
-                    ))
-                }
-            </>
-        )
-    };
+
+    useEffect(() => {
+        axios.get('http://localhost:8080/round')
+            .then(res => {
+                const { uid, player } = res.data.data;
+                setRoundId(uid);
+                setPlayers(player);
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    }, []);
 
     return (
         <Layout>
