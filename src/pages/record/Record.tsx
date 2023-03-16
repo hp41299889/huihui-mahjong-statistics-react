@@ -8,6 +8,7 @@ import DrawForm from "./DrawForm";
 import FakeForm from "./FakeForm";
 import { EEndType, EWindLabel, EWind } from "../../enum";
 import { IRecordForm } from "../../interface";
+import { windOptions } from "../../option";
 
 
 interface IEndType {
@@ -74,16 +75,31 @@ const Record: React.FC = () => {
     };
 
     const renderPlayerList = (dealerNum: number) => {
-        console.log(players);
-        return (
-            <div>
-                {windList.map((item, index) => (
-                    <>
-                        {players[index].name && <span key={`${item}_${index}`}>{players[index].name}</span>}
-                    </>
-                ))}
-            </div>
-        )
+        if (players.length < 1) {
+            return null;
+        } else {
+            return (
+                <>
+                    {windOptions.map((wind, index) => (
+                        <div
+                            style={{ display: 'flex', flexDirection: 'column' }}
+                            key={`${wind.value}_${players[index].name}`}
+                        >
+                            {index === dealerNum && <>
+                                <span style={{ color: 'red' }}>{wind.label}</span>
+                                <span style={{ color: 'red' }}> {players[index].name}</span>
+                            </>}
+                            {index !== dealerNum && <>
+                                <span>{wind.label}</span>
+                                <span>{players[index].name}</span>
+                            </>}
+
+                        </div>
+                    ))
+                    }
+                </>
+            )
+        };
     };
 
     const onChangeEndType = (e: RadioChangeEvent) => {
