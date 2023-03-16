@@ -28,16 +28,16 @@ const Round: React.FC = () => {
                 <Form.Item label='台' name='point'>
                     <Input />
                 </Form.Item>
-                <Form.Item label='東' name='eastId'>
+                <Form.Item label='東' name='eastName'>
                     <Input />
                 </Form.Item>
-                <Form.Item label='南' name='southId'>
+                <Form.Item label='南' name='southName'>
                     <Input />
                 </Form.Item>
-                <Form.Item label='西' name='westId'>
+                <Form.Item label='西' name='westName'>
                     <Input />
                 </Form.Item>
-                <Form.Item label='北' name='northId'>
+                <Form.Item label='北' name='northName'>
                     <Input />
                 </Form.Item>
                 <Form.Item>

@@ -8,40 +8,27 @@ import DrawForm from "./DrawForm";
 import FakeForm from "./FakeForm";
 import { EEndType, EWindLabel, EWind } from "../../enum";
 import { IRecordForm } from "../../interface";
-import { windOptions } from "../../option";
-
-
 interface IEndType {
     label: string;
     value: EEndType;
 };
 
-interface Iplayer {
-    id: number;
-    name: string;
-    createdAt: Date;
-    updatedAt: Date;
-};
+interface IWindList {
+    key: EWind;
+    label: EWindLabel;
+}
 
-const endTypeOptions: IEndType[] = [
+export const endTypeOptions: IEndType[] = [
     { label: '胡', value: EEndType.WINNING },
     { label: '摸', value: EEndType.SELF_DRAWN },
     { label: '流', value: EEndType.DRAW },
     { label: '詐', value: EEndType.FAKE }
 ];
-
-const windLabelList: EWindLabel[] = [
-    EWindLabel.EAST,
-    EWindLabel.SOUTH,
-    EWindLabel.WEST,
-    EWindLabel.NORTH
-];
-
-const windList = [
-    EWind.EAST,
-    EWind.SOUTH,
-    EWind.WEST,
-    EWind.NORTH
+export const windList: IWindList[] = [
+    { key: EWind.EAST, label: EWindLabel.EAST },
+    { key: EWind.SOUTH, label: EWindLabel.SOUTH },
+    { key: EWind.WEST, label: EWindLabel.WEST },
+    { key: EWind.NORTH, label: EWindLabel.NORTH }
 ];
 
 const Record: React.FC = () => {
@@ -52,7 +39,7 @@ const Record: React.FC = () => {
     const [dealerNum, setDealerNum] = useState<number>(0);
     const [dealerCount, setDealerCount] = useState<number>(0);
     const [roundId, setRoundId] = useState<string>('');
-    const [players, setPlayers] = useState<Iplayer[]>([]);
+    const [players, setPlayers] = useState<string[]>([]);
 
     const renderForm = (endType: EEndType) => {
         switch (endType) {
@@ -80,20 +67,19 @@ const Record: React.FC = () => {
         } else {
             return (
                 <>
-                    {windOptions.map((wind, index) => (
+                    {windList.map((wind, index) => (
                         <div
                             style={{ display: 'flex', flexDirection: 'column' }}
-                            key={`${wind.value}_${players[index].name}`}
+                            key={`${wind.key}_${players[index]}`}
                         >
                             {index === dealerNum && <>
                                 <span style={{ color: 'red' }}>{wind.label}</span>
-                                <span style={{ color: 'red' }}> {players[index].name}</span>
+                                <span style={{ color: 'red' }}> {players[index]}</span>
                             </>}
                             {index !== dealerNum && <>
                                 <span>{wind.label}</span>
-                                <span>{players[index].name}</span>
+                                <span>{players[index]}</span>
                             </>}
-
                         </div>
                     ))
                     }
@@ -119,7 +105,7 @@ const Record: React.FC = () => {
     };
     const onSubmit = async (value: IRecordForm) => {
         value.endType = endType;
-        value.dealer = windList[dealerNum];
+        value.dealer = windList[dealerNum].key;
         if (await isDealerContinue(value)) {
             setDealerCount(preDealerCount => preDealerCount + 1);
         } else {
@@ -137,11 +123,19 @@ const Record: React.FC = () => {
         console.log(players);
     };
 
+    const findIndex = (input: string) => {
+        const index = windList.findIndex(wind => wind.key === input);
+        return index;
+    };
 
     useEffect(() => {
         axios.get('http://localhost:8080/round')
             .then(res => {
-                const { uid, player } = res.data.data;
+                const { uid, player, circle, wind } = res.data.data;
+                console.log(uid);
+
+                setCircleNum(findIndex(circle));
+                setDealerNum(findIndex(wind));
                 setRoundId(uid);
                 setPlayers(player);
             })
@@ -153,7 +147,7 @@ const Record: React.FC = () => {
     return (
         <Layout>
             <Typography.Title className='title'>
-                {windLabelList[circleNum]}風{windLabelList[roundNum]}局
+                {windList[circleNum].label}風{windList[dealerNum].label}局
             </Typography.Title>
             <Typography.Text className='dealer-count'>連莊:{dealerCount}</Typography.Text>
             <div className='player-list'>
