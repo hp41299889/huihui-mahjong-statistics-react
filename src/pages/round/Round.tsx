@@ -17,7 +17,6 @@ const Round: React.FC = () => {
     const onSubmit = (value: any) => {
         axios.post(`http://10.200.25.179:8080/round`, value)
             .then(res => {
-                console.log(res);
                 navigate('/record');
             })
             .catch(err => {
@@ -37,7 +36,6 @@ const Round: React.FC = () => {
     useEffect(() => {
         axios.get(`http://10.200.25.179:8080/player`)
             .then(res => {
-                console.log(res);
                 setPlayers(res.data.data);
             })
             .catch(err => {
@@ -49,32 +47,50 @@ const Round: React.FC = () => {
         <Layout>
             <Form
                 onFinish={onSubmit}
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}
             >
-                <Row >
-                    <Col span={8}>
+                <Row>
+                    <Col span={12}>
                         <Form.Item label='底' name='base'>
                             <Input />
                         </Form.Item>
                     </Col>
-                    <Col span={8}>
+                    <Col span={12}>
                         <Form.Item label='台' name='point'>
                             <Input />
                         </Form.Item>
                     </Col>
                 </Row>
-                <Form.Item label='東' name='eastName'>
-                    {renderPlayerSelectOption()}
-                </Form.Item>
-                <Form.Item label='南' name='southName'>
-                    {renderPlayerSelectOption()}
-                </Form.Item>
-                <Form.Item label='西' name='westName'>
-                    {renderPlayerSelectOption()}
-                </Form.Item>
-                <Form.Item label='北' name='northName'>
-                    {renderPlayerSelectOption()}
-                </Form.Item>
-                <Form.Item>
+                <Row>
+                    <Col span={6}>
+                        <Form.Item label='東' name='eastName'>
+                            {renderPlayerSelectOption()}
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item label='南' name='southName'>
+                            {renderPlayerSelectOption()}
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item label='西' name='westName'>
+                            {renderPlayerSelectOption()}
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item label='北' name='northName'>
+                            {renderPlayerSelectOption()}
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Form.Item
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'end'
+                    }}>
                     <Button htmlType='submit'>Submit</Button>
                 </Form.Item>
             </Form>
