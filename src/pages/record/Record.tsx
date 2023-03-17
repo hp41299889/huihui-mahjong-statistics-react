@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Radio, RadioChangeEvent, Typography, Form, Button } from "antd";
-import axios from "axios";
+import { mahjongApi } from "../../utils/request";
 import './record.css';
 import WinningForm from "./WinningForm";
 import SelfDrawnForm from "./SelfDrawnForm";
@@ -103,8 +103,18 @@ const Record: React.FC = () => {
         return false;
     };
     const onSubmit = async (value: IRecordForm) => {
+        //TODO POST loser要是陣列後端才不會解析錯誤，圈數及莊家計算有誤，reload仍必須與資料庫同步
         value.endType = endType;
         value.dealer = windList[dealerNum].key;
+        value.dealerCount = dealerCount;
+        value.circle = windList[circleNum].key;
+        mahjongApi.post(`/record/${roundId}`, value)
+            .then(res => {
+                console.log(res);
+            })
+            .catch(err => {
+                console.log(err);
+            })
         if (await isDealerContinue(value)) {
             setDealerCount(preDealerCount => preDealerCount + 1);
         } else {
@@ -126,7 +136,7 @@ const Record: React.FC = () => {
     };
 
     useEffect(() => {
-        axios.get('http://10.200.25.179:8080/round')
+        mahjongApi.get('/round')
             .then(res => {
                 const { uid, player, circle, wind } = res.data.data;
                 setCircleNum(findIndex(circle));
@@ -161,6 +171,7 @@ const Record: React.FC = () => {
                 onFinish={onSubmit}
             >
                 {renderForm(endType)}
+                <Form.Item />
                 <Form.Item>
                     <Button
                         type='primary'

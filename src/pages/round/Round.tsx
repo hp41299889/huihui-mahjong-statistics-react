@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Form, Input, Layout, Row, Col, Select } from "antd";
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
-
-const apiUrl = `http://${process.env.HUIHUI_MAHJONG_API_BASE_URL}`;
+import { mahjongApi } from "../../utils/request";
 interface IPlayer {
     id: number;
     name: string;
@@ -15,9 +13,9 @@ const Round: React.FC = () => {
     const [players, setPlayers] = useState<IPlayer[]>([]);
     const navigate = useNavigate();
     const onSubmit = (value: any) => {
-        axios.post(`http://10.200.25.179:8080/round`, value)
+        mahjongApi.post('/round', value)
             .then(res => {
-                navigate('/record');
+                navigate('/record')
             })
             .catch(err => {
                 console.log(err);
@@ -34,13 +32,13 @@ const Round: React.FC = () => {
     );
 
     useEffect(() => {
-        axios.get(`http://10.200.25.179:8080/player`)
+        mahjongApi.get('/player')
             .then(res => {
                 setPlayers(res.data.data);
             })
             .catch(err => {
                 console.log(err);
-            })
+            });
     }, []);
 
     return (
