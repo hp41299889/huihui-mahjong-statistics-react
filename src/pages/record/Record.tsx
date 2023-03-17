@@ -81,8 +81,7 @@ const Record: React.FC = () => {
                                 <span>{players[index]}</span>
                             </>}
                         </div>
-                    ))
-                    }
+                    ))}
                 </>
             )
         };
@@ -119,8 +118,6 @@ const Record: React.FC = () => {
                 setDealerCount(0);
             };
         };
-        console.log(value);
-        console.log(players);
     };
 
     const findIndex = (input: string) => {
@@ -129,11 +126,9 @@ const Record: React.FC = () => {
     };
 
     useEffect(() => {
-        axios.get('http://localhost:8080/round')
+        axios.get('http://10.200.25.179:8080/round')
             .then(res => {
                 const { uid, player, circle, wind } = res.data.data;
-                console.log(uid);
-
                 setCircleNum(findIndex(circle));
                 setDealerNum(findIndex(wind));
                 setRoundId(uid);
