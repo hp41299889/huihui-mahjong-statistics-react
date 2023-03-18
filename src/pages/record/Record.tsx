@@ -108,6 +108,11 @@ const Record: React.FC = () => {
         value.dealer = windList[dealerNum].key;
         value.dealerCount = dealerCount;
         value.circle = windList[circleNum].key;
+        if (value.endType === EEndType.WINNING) {
+            //非常之古怪 Enum問題，暫時用any強制加上陣列
+            value.loser = [value.loser];
+        };
+
         mahjongApi.post(`/record/${roundId}`, value)
             .then(res => {
                 console.log(res);
@@ -128,6 +133,7 @@ const Record: React.FC = () => {
                 setDealerCount(0);
             };
         };
+        console.log(value);
     };
 
     const findIndex = (input: string) => {
@@ -138,11 +144,20 @@ const Record: React.FC = () => {
     useEffect(() => {
         mahjongApi.get('/round')
             .then(res => {
-                const { uid, player, circle, wind } = res.data.data;
-                setCircleNum(findIndex(circle));
-                setDealerNum(findIndex(wind));
+                console.log(res.data);
+
+                const { uid, players, circle, wind, dealerCount } = res.data.data;
+                console.log('circle index', findIndex(circle));
+                console.log('wind index', findIndex(wind));
+                if (findIndex(wind) + 1 === 4) {
+                    setCircleNum(findIndex(circle) + 1);
+                    setDealerNum(0);
+                } else {
+                    setCircleNum(findIndex(circle));
+                    setDealerNum(findIndex(wind) + 1);
+                };
                 setRoundId(uid);
-                setPlayers(player);
+                setPlayers(players);
             })
             .catch(err => {
                 console.log(err);
@@ -171,7 +186,6 @@ const Record: React.FC = () => {
                 onFinish={onSubmit}
             >
                 {renderForm(endType)}
-                <Form.Item />
                 <Form.Item>
                     <Button
                         type='primary'

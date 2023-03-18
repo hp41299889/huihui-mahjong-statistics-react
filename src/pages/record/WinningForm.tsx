@@ -8,7 +8,7 @@ import PointIntput from "./PointInput";
 const WinningForm: React.FC = () => {
 
     const [winner, setWinner] = useState<EWind>(EWind.EAST);
-    const [loser, setLoser] = useState('south');
+    const [loser, setLoser] = useState<EWind[]>([]);
 
     const onChangeWinner = (e: RadioChangeEvent) => {
         setWinner(e.target.value);
@@ -28,7 +28,7 @@ const WinningForm: React.FC = () => {
             >
                 <Radio.Group
                     onChange={onChangeWinner}
-                    value={winner}
+                    value={[winner]}
                     options={windOptions}
                 />
             </Form.Item>

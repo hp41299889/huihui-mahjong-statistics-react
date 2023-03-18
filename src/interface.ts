@@ -8,7 +8,7 @@ export interface IRadioOption {
 export interface IRecordForm {
     endType: EEndType;
     winner: EWind;
-    loser: EWind | EWind[];
+    loser: any;
     point: number;
     dealer: EWind;
     dealerCount: number;
