@@ -7,10 +7,10 @@ export interface IRadioOption {
 
 export interface IRecordForm {
     endType: EEndType;
-    winner: EWind;
+    winner: number;
     loser: any;
     point: number;
-    dealer: EWind;
+    dealer: number;
     dealerCount: number;
-    circle: EWind;
+    circle: number;
 }

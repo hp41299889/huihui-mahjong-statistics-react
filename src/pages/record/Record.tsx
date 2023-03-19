@@ -8,6 +8,7 @@ import DrawForm from "./DrawForm";
 import FakeForm from "./FakeForm";
 import { EEndType, EWindLabel, EWind } from "../../enum";
 import { IRecordForm } from "../../interface";
+import { useNavigate } from "react-router-dom";
 interface IEndType {
     label: string;
     value: EEndType;
@@ -35,11 +36,11 @@ const Record: React.FC = () => {
 
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
     const [circleNum, setCircleNum] = useState<number>(0);
-    const [roundNum, setRoundNum] = useState<number>(0);
     const [dealerNum, setDealerNum] = useState<number>(0);
     const [dealerCount, setDealerCount] = useState<number>(0);
     const [roundId, setRoundId] = useState<string>('');
     const [players, setPlayers] = useState<string[]>([]);
+    const navigate = useNavigate();
 
     const renderForm = (endType: EEndType) => {
         switch (endType) {
@@ -105,9 +106,9 @@ const Record: React.FC = () => {
     const onSubmit = async (value: IRecordForm) => {
         //TODO POST loser要是陣列後端才不會解析錯誤，圈數及莊家計算有誤，reload仍必須與資料庫同步
         value.endType = endType;
-        value.dealer = windList[dealerNum].key;
+        value.dealer = dealerNum;
         value.dealerCount = dealerCount;
-        value.circle = windList[circleNum].key;
+        value.circle = circleNum;
         if (value.endType === EEndType.WINNING) {
             //非常之古怪 Enum問題，暫時用any強制加上陣列
             value.loser = [value.loser];
@@ -123,12 +124,10 @@ const Record: React.FC = () => {
         if (await isDealerContinue(value)) {
             setDealerCount(preDealerCount => preDealerCount + 1);
         } else {
-            if (roundNum === 3) {
+            if (dealerNum === 3) {
                 setCircleNum(preCircleNum => preCircleNum + 1);
                 setDealerNum(0);
-                setRoundNum(0);
             } else {
-                setRoundNum(preRoundNum => preRoundNum + 1);
                 setDealerNum(preDealerNum => preDealerNum + 1);
                 setDealerCount(0);
             };
@@ -145,19 +144,16 @@ const Record: React.FC = () => {
         mahjongApi.get('/round')
             .then(res => {
                 console.log(res.data);
-
-                const { uid, players, circle, wind, dealerCount } = res.data.data;
-                console.log('circle index', findIndex(circle));
-                console.log('wind index', findIndex(wind));
-                if (findIndex(wind) + 1 === 4) {
-                    setCircleNum(findIndex(circle) + 1);
-                    setDealerNum(0);
+                const { uid, players, circle, dealer, dealerCount } = res.data.data;
+                if (uid) {
+                    setCircleNum(circle);
+                    setDealerNum(dealer);
+                    setDealerCount(dealerCount);
+                    setRoundId(uid);
+                    setPlayers(players);
                 } else {
-                    setCircleNum(findIndex(circle));
-                    setDealerNum(findIndex(wind) + 1);
+                    navigate('/round');
                 };
-                setRoundId(uid);
-                setPlayers(players);
             })
             .catch(err => {
                 console.log(err);
