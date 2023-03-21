@@ -13,13 +13,11 @@ COPY . .
 RUN npm run build
 
 # 使用 Nginx 镜像
-FROM nginx:alpine
+FROM node:18-alpine
 
 # 复制构建好的 React 应用程序到 Nginx 容器中
-COPY --from=build /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/build /app/build
 
-EXPOSE 80
+RUN npm install -g serve
 
-# 暴露端口
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["serve", "-s", "/app/build", "-l", "80"]
