@@ -1,25 +1,22 @@
-# 依赖构建阶段
-FROM node:18-alpine as dependencies
+# 基础镜像
+FROM node:18-alpine AS build
 
+# 设置工作目录
 WORKDIR /app
 
-COPY package*.json ./
+# 安装依赖
+COPY package.json package-lock.json ./
 RUN npm ci
 
-# 构建阶段
-FROM node:18-alpine as build-stage
-
-WORKDIR /app
-
-COPY --from=dependencies /app/node_modules /app/node_modules
+# 复制源代码并构建
 COPY . .
-
 RUN npm run build
 
-# 部署阶段
-FROM nginx:stable-alpine as production-stage
+# 使用 Nginx 镜像
+FROM nginx:alpine
 
-COPY --from=build-stage /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# 复制构建好的 React 应用程序到 Nginx 容器中
+COPY --from=build /app/build /usr/share/nginx/html
 
-CMD ["nginx", "-g", "daemon off;"]
+# 暴露端口
+EXPOSE 80
