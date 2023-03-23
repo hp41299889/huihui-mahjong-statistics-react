@@ -1,8 +1,6 @@
-FROM node:16.16.0
+FROM node:18-alpine
 WORKDIR /app
-COPY build ./build
-COPY package.json .
-COPY .env .
-RUN npm install
+COPY ./build ./build
 RUN npm install -g serve
-CMD npm run serve
+EXPOSE 3030
+CMD ["serve", "-s", "build", "-l", "3030"]
