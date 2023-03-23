@@ -8,7 +8,6 @@ const Player = () => {
         console.log(value);
         mahjongApi.post('/player', value)
             .then(res => {
-                console.log(res.data);
                 navigate('/player');
             })
             .catch(err => {
