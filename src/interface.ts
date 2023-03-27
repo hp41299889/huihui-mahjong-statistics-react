@@ -1,4 +1,4 @@
-import { EWind, EEndType } from "./enum";
+import { EWind, EEndType } from "./pages/enum";
 
 export interface IRadioOption {
     label: string;

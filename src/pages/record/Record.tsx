@@ -6,9 +6,12 @@ import WinningForm from "./WinningForm";
 import SelfDrawnForm from "./SelfDrawnForm";
 import DrawForm from "./DrawForm";
 import FakeForm from "./FakeForm";
-import { EEndType, EWindLabel, EWind } from "../../enum";
 import { IRecordForm } from "../../interface";
 import { useNavigate } from "react-router-dom";
+
+import { IRound, IPlayer } from "../interface";
+import { EWindLabel, EEndType, EWind } from "../enum";
+import { OWind } from "../option";
 interface IEndType {
     label: string;
     value: EEndType;
@@ -18,6 +21,8 @@ interface IWindList {
     key: EWind;
     label: EWindLabel;
 }
+
+
 
 export const endTypeOptions: IEndType[] = [
     { label: '胡', value: EEndType.WINNING },
@@ -34,11 +39,19 @@ export const windList: IWindList[] = [
 
 const Record: React.FC = () => {
 
+    const [round, setRound] = useState<IRound>({
+        roundUid: '',
+        base: 0,
+        point: 0,
+        deskType: ''
+    });
+    const [dealer, setDealer] = useState<EWind>();
+
+
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
     const [circleNum, setCircleNum] = useState<number>(0);
     const [dealerNum, setDealerNum] = useState<number>(0);
     const [dealerCount, setDealerCount] = useState<number>(0);
-    const [roundId, setRoundId] = useState<string>('');
     const [players, setPlayers] = useState<string[]>([]);
     const navigate = useNavigate();
 
@@ -62,30 +75,59 @@ const Record: React.FC = () => {
         };
     };
 
-    const renderPlayerList = (dealerNum: number) => {
-        if (players.length < 1) {
-            return null;
-        } else {
-            return (
-                <>
-                    {windList.map((wind, index) => (
-                        <div
-                            style={{ display: 'flex', flexDirection: 'column' }}
-                            key={`${wind.key}_${players[index]}`}
-                        >
-                            {index === dealerNum && <>
-                                <span style={{ color: 'red' }}>{wind.label}</span>
-                                <span style={{ color: 'red' }}> {players[index]}</span>
-                            </>}
-                            {index !== dealerNum && <>
-                                <span>{wind.label}</span>
-                                <span>{players[index]}</span>
-                            </>}
-                        </div>
-                    ))}
-                </>
-            )
-        };
+    const RenderPlayerList: React.FC = () => {
+        return (
+            <>
+                {round.players && <>
+                    {OWind.map((wind, index) => {
+                        {
+                            wind.value === dealer
+                                ? <>
+                                    <span style={{ color: 'red' }}>{wind.label}</span>
+                                    <span style={{ color: 'red' }}></span>
+                                </>
+                                : <>
+                                    <span>{wind.label}</span>
+                                    <span>{players[index]}</span>
+                                </>
+                        }
+                    })}
+                    {/* {Object.keys(round.players).map(key => {
+                        {
+                            key === dealer
+                                ? <>
+                                <span style={{ color: 'red' }}>{EWind[]}</span>
+                                    <span style={{ color: 'red' }}> {players[index]}</span>
+                                    </>
+                                :
+                    }
+                    })} */}
+                </>}
+            </>
+        )
+        // if (players.length < 1) {
+        //     return null;
+        // } else {
+        //     return (
+        //         <>
+        //             {windList.map((wind, index) => (
+        //                 <div
+        //                     style={{ display: 'flex', flexDirection: 'column' }}
+        //                     key={`${wind.key}_${players[index]}`}
+        //                 >
+        //                     {index === dealerNum && <>
+        //                         <span style={{ color: 'red' }}>{wind.label}</span>
+        //                         <span style={{ color: 'red' }}> {players[index]}</span>
+        //                     </>}
+        //                     {index !== dealerNum && <>
+        //                         <span>{wind.label}</span>
+        //                         <span>{players[index]}</span>
+        //                     </>}
+        //                 </div>
+        //             ))}
+        //         </>
+        //     )
+        // };
     };
 
     const onChangeEndType = (e: RadioChangeEvent) => {
@@ -114,13 +156,13 @@ const Record: React.FC = () => {
             value.loser = [value.loser];
         };
 
-        mahjongApi.post(`/record/${roundId}`, value)
-            .then(res => {
-                console.log(res);
-            })
-            .catch(err => {
-                console.log(err);
-            })
+        // mahjongApi.post(`/record/${roundId}`, value)
+        //     .then(res => {
+        //         console.log(res);
+        //     })
+        //     .catch(err => {
+        //         console.log(err);
+        //     })
         if (await isDealerContinue(value)) {
             setDealerCount(preDealerCount => preDealerCount + 1);
         } else {
@@ -144,16 +186,19 @@ const Record: React.FC = () => {
         mahjongApi.get('/round')
             .then(res => {
                 console.log(res.data);
-                const { uid, players, circle, dealer, dealerCount } = res.data.data;
-                if (uid) {
-                    setCircleNum(circle);
-                    setDealerNum(dealer);
-                    setDealerCount(dealerCount);
-                    setRoundId(uid);
-                    setPlayers(players);
-                } else {
-                    navigate('/round');
-                };
+                const { data }: { data: IRound } = res;
+                setRound(data);
+                // setRoundUid(data);
+                // const { uid, players, circle, dealer, dealerCount } = res.data.data;
+                // if (uid) {
+                //     setCircleNum(circle);
+                //     setDealerNum(dealer);
+                //     setDealerCount(dealerCount);
+                //     setRoundId(uid);
+                //     setPlayers(players);
+                // } else {
+                //     navigate('/round');
+                // };
             })
             .catch(err => {
                 console.log(err);
@@ -167,7 +212,8 @@ const Record: React.FC = () => {
             </Typography.Title>
             <Typography.Text className='dealer-count'>連莊:{dealerCount}</Typography.Text>
             <div className='player-list'>
-                {renderPlayerList(dealerNum)}
+                <RenderPlayerList />
+                {/* {renderPlayerList(dealerNum)} */}
             </div>
             <div className='endType-list'>
                 <Radio.Group

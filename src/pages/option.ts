@@ -1,7 +1,7 @@
-import { IRadioOption } from "./interface";
-import { EWind } from "./pages/enum";
+// import { IRadioOption } from "./interface";
+import { EWind } from "./enum";
 
-export const windOptions: IRadioOption[] = [
+export const OWind = [
     { label: '東', value: EWind.EAST },
     { label: '南', value: EWind.SOUTH },
     { label: '西', value: EWind.WEST },

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Radio, RadioChangeEvent } from "antd";
-import { EWind } from "../../enum";
+import { EWind } from "../enum";
 import PointIntput from "./PointInput";
 
 const windOptions = [

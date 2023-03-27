@@ -1,6 +1,6 @@
 import { Typography } from "antd";
 import { IRecordForm } from "../../interface";
-import { EWindLabel } from "../../enum";
+import { EWindLabel } from "../enum";
 import './playerList.css';
 
 interface IPlayerList {
