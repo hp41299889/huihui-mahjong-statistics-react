@@ -1,204 +1,97 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Radio, RadioChangeEvent, Typography, Form, Button } from "antd";
+import { Layout, Radio, RadioChangeEvent, Typography, Form, Button, Space } from "antd";
 import { mahjongApi } from "../../utils/request";
 import './record.css';
 import WinningForm from "./WinningForm";
 import SelfDrawnForm from "./SelfDrawnForm";
 import DrawForm from "./DrawForm";
 import FakeForm from "./FakeForm";
-import { IRecordForm } from "../../interface";
 import { useNavigate } from "react-router-dom";
-
-import { IRound, IPlayer } from "../interface";
+import PlayerList from "./PlayerList";
+import { IRound, IPlayer, IRecordForm } from "../interface";
 import { EWindLabel, EEndType, EWind } from "../enum";
-import { OWind } from "../option";
-interface IEndType {
-    label: string;
-    value: EEndType;
-};
+import { OWind, OEndType } from "../option";
+import { windLabelMap } from "../enumMap";
 
-interface IWindList {
-    key: EWind;
-    label: EWindLabel;
-}
+const { Text, Title } = Typography;
 
-
-
-export const endTypeOptions: IEndType[] = [
-    { label: '胡', value: EEndType.WINNING },
-    { label: '摸', value: EEndType.SELF_DRAWN },
-    { label: '流', value: EEndType.DRAW },
-    { label: '詐', value: EEndType.FAKE }
-];
-export const windList: IWindList[] = [
-    { key: EWind.EAST, label: EWindLabel.EAST },
-    { key: EWind.SOUTH, label: EWindLabel.SOUTH },
-    { key: EWind.WEST, label: EWindLabel.WEST },
-    { key: EWind.NORTH, label: EWindLabel.NORTH }
-];
 
 const Record: React.FC = () => {
-
     const [round, setRound] = useState<IRound>({
         roundUid: '',
         base: 0,
+        players: {
+            east: { name: '' },
+            south: { name: '' },
+            west: { name: '' },
+            north: { name: '' }
+        },
         point: 0,
+        circle: EWind.EAST,
+        dealer: EWind.EAST,
         deskType: ''
     });
-    const [dealer, setDealer] = useState<EWind>();
-
-
-    const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
+    const [players, setPlayers] = useState<IPlayer[]>([]);
     const [circleNum, setCircleNum] = useState<number>(0);
+    const [circle, setCircle] = useState<EWind>(EWind.EAST);
+    const [dealer, setDealer] = useState<EWind>(EWind.EAST);
+
     const [dealerNum, setDealerNum] = useState<number>(0);
     const [dealerCount, setDealerCount] = useState<number>(0);
-    const [players, setPlayers] = useState<string[]>([]);
-    const navigate = useNavigate();
+    const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
 
-    const renderForm = (endType: EEndType) => {
-        switch (endType) {
-            case 'winning': {
-                return <WinningForm />
-            }
-
-            case 'self-drawn': {
-                return <SelfDrawnForm />
-            }
-
-            case 'draw': {
-                return <DrawForm />
-            }
-
-            case 'fake': {
-                return <FakeForm />
-            }
-        };
-    };
-
-    const RenderPlayerList: React.FC = () => {
-        return (
-            <>
-                {round.players && <>
-                    {OWind.map((wind, index) => {
-                        {
-                            wind.value === dealer
-                                ? <>
-                                    <span style={{ color: 'red' }}>{wind.label}</span>
-                                    <span style={{ color: 'red' }}></span>
-                                </>
-                                : <>
-                                    <span>{wind.label}</span>
-                                    <span>{players[index]}</span>
-                                </>
-                        }
-                    })}
-                    {/* {Object.keys(round.players).map(key => {
-                        {
-                            key === dealer
-                                ? <>
-                                <span style={{ color: 'red' }}>{EWind[]}</span>
-                                    <span style={{ color: 'red' }}> {players[index]}</span>
-                                    </>
-                                :
-                    }
-                    })} */}
-                </>}
-            </>
-        )
-        // if (players.length < 1) {
-        //     return null;
-        // } else {
-        //     return (
-        //         <>
-        //             {windList.map((wind, index) => (
-        //                 <div
-        //                     style={{ display: 'flex', flexDirection: 'column' }}
-        //                     key={`${wind.key}_${players[index]}`}
-        //                 >
-        //                     {index === dealerNum && <>
-        //                         <span style={{ color: 'red' }}>{wind.label}</span>
-        //                         <span style={{ color: 'red' }}> {players[index]}</span>
-        //                     </>}
-        //                     {index !== dealerNum && <>
-        //                         <span>{wind.label}</span>
-        //                         <span>{players[index]}</span>
-        //                     </>}
-        //                 </div>
-        //             ))}
-        //         </>
-        //     )
-        // };
-    };
+    const RenderForm: React.FC = () => (
+        <Space>
+            {endType === EEndType.WINNING && <WinningForm players={round.players} />}
+            {endType === EEndType.SELF_DRAWN && <SelfDrawnForm />}
+            {endType === EEndType.DRAW && <DrawForm />}
+            {endType === EEndType.FAKE && <FakeForm />}
+        </Space>
+    );
 
     const onChangeEndType = (e: RadioChangeEvent) => {
         setEndType(e.target.value);
     };
-    const isDealerContinue = async (props: IRecordForm) => {
-        if (props.winner === props.dealer) {
-            return true;
-        };
-        if (props.endType === EEndType.DRAW) {
-            return true;
-        };
-        if (props.endType === EEndType.FAKE) {
-            return true;
-        }
+
+    const isDealerContinue = async (value: IRecordForm) => {
+        if (value.winner === players[dealerNum].name) return true;
+        if (value.endType === EEndType.DRAW) return true;
+        if (value.endType === EEndType.FAKE) return true;
         return false;
     };
-    const onSubmit = async (value: IRecordForm) => {
-        //TODO POST loser要是陣列後端才不會解析錯誤，圈數及莊家計算有誤，reload仍必須與資料庫同步
-        value.endType = endType;
-        value.dealer = dealerNum;
-        value.dealerCount = dealerCount;
-        value.circle = circleNum;
-        if (value.endType === EEndType.WINNING) {
-            //非常之古怪 Enum問題，暫時用any強制加上陣列
-            value.loser = [value.loser];
-        };
 
-        // mahjongApi.post(`/record/${roundId}`, value)
-        //     .then(res => {
-        //         console.log(res);
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //     })
-        if (await isDealerContinue(value)) {
-            setDealerCount(preDealerCount => preDealerCount + 1);
-        } else {
-            if (dealerNum === 3) {
-                setCircleNum(preCircleNum => preCircleNum + 1);
-                setDealerNum(0);
-            } else {
-                setDealerNum(preDealerNum => preDealerNum + 1);
-                setDealerCount(0);
-            };
-        };
-        console.log(value);
+    const isNextCircle = async (value: IRecordForm) => {
+        if (value.dealer === EWind.NORTH) return true;
+        return false;
     };
 
-    const findIndex = (input: string) => {
-        const index = windList.findIndex(wind => wind.key === input);
-        return index;
+    const findNextWind = (currentWind: EWind) => {
+        const index = OWind.findIndex(wind => wind.value === currentWind)
+        return OWind[index + 1];
+    }
+
+    const onSubmit = async (value: IRecordForm) => {
+        value.dealer = OWind[dealerNum].value;
+        console.log(value);
+        if (await isDealerContinue(value)) {
+            setDealerCount(pre => pre + 1);
+        } else {
+            setDealerCount(0);
+            if (await isNextCircle(value)) {
+                setCircleNum(pre => pre + 1);
+                setDealerNum(0);
+            } else {
+                setDealerNum(pre => pre + 1);
+            };
+        };
     };
 
     useEffect(() => {
         mahjongApi.get('/round')
             .then(res => {
-                console.log(res.data);
-                const { data }: { data: IRound } = res;
+                const { data }: { data: IRound } = res.data;
                 setRound(data);
-                // setRoundUid(data);
-                // const { uid, players, circle, dealer, dealerCount } = res.data.data;
-                // if (uid) {
-                //     setCircleNum(circle);
-                //     setDealerNum(dealer);
-                //     setDealerCount(dealerCount);
-                //     setRoundId(uid);
-                //     setPlayers(players);
-                // } else {
-                //     navigate('/round');
-                // };
+                // setPlayers(data.players);
             })
             .catch(err => {
                 console.log(err);
@@ -207,27 +100,31 @@ const Record: React.FC = () => {
 
     return (
         <Layout>
-            <Typography.Title className='title'>
-                {windList[circleNum].label}風{windList[dealerNum].label}局
-            </Typography.Title>
-            <Typography.Text className='dealer-count'>連莊:{dealerCount}</Typography.Text>
-            <div className='player-list'>
-                <RenderPlayerList />
-                {/* {renderPlayerList(dealerNum)} */}
-            </div>
-            <div className='endType-list'>
+            <Title className='title'>
+                {`${windLabelMap[circle]}風${windLabelMap[dealer]}局`}
+            </Title>
+            <Text className='dealer-count'>
+                連莊:{dealerCount}
+            </Text>
+            <Space className='player-list'>
+                <PlayerList
+                    players={round.players}
+                    dealer={dealer}
+                />
+            </Space>
+            <Space className='endType-list'>
                 <Radio.Group
                     onChange={onChangeEndType}
                     value={endType}
-                    options={endTypeOptions}
+                    options={OEndType}
                     defaultValue={'winning'}
                 />
-            </div>
+            </Space>
             <Form
                 className='record-form'
                 onFinish={onSubmit}
             >
-                {renderForm(endType)}
+                <RenderForm />
                 <Form.Item>
                     <Button
                         type='primary'

@@ -2,19 +2,19 @@ import React, { useState } from "react";
 import { Form, Radio, RadioChangeEvent } from "antd";
 import { EWind } from "../enum";
 import PointIntput from "./PointInput";
-
-const windOptions = [
-    { label: '東', value: 0 },
-    { label: '南', value: 1 },
-    { label: '西', value: 2 },
-    { label: '北', value: 3 }
-];
+import { IPlayer, IWinningForm } from "../interface";
 
 //TODO all option change to windList
-const WinningForm: React.FC = () => {
-
-    const [winner, setWinner] = useState<number>(0);
-    const [loser, setLoser] = useState<string[]>([]);
+const WinningForm: React.FC<IWinningForm> = (props) => {
+    const { players } = props;
+    const [winner, setWinner] = useState<string>('');
+    const [loser, setLoser] = useState<string>('');
+    const windPlayerMap = {
+        [EWind.EAST]: players.east?.name,
+        [EWind.SOUTH]: players.south?.name,
+        [EWind.WEST]: players.west?.name,
+        [EWind.NORTH]: players.north?.name,
+    };
 
     const onChangeWinner = (e: RadioChangeEvent) => {
         setWinner(e.target.value);
@@ -24,7 +24,14 @@ const WinningForm: React.FC = () => {
         setLoser(e.target.value);
     };
 
-    const loserOptions = windOptions.filter(option => option.value !== winner);
+    const winnerOptions = [
+        { label: windPlayerMap[EWind.EAST], value: windPlayerMap[EWind.EAST] },
+        { label: windPlayerMap[EWind.SOUTH], value: windPlayerMap[EWind.SOUTH] },
+        { label: windPlayerMap[EWind.WEST], value: windPlayerMap[EWind.WEST] },
+        { label: windPlayerMap[EWind.NORTH], value: windPlayerMap[EWind.NORTH] },
+    ];
+
+    const loserOptions = winnerOptions.filter(option => option.label !== winner);
 
     return (
         <>
@@ -34,8 +41,8 @@ const WinningForm: React.FC = () => {
             >
                 <Radio.Group
                     onChange={onChangeWinner}
-                    value={[winner]}
-                    options={windOptions}
+                    value={winner}
+                    options={winnerOptions}
                 />
             </Form.Item>
             <Form.Item

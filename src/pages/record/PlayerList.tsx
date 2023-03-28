@@ -1,42 +1,31 @@
-import { Typography } from "antd";
-import { IRecordForm } from "../../interface";
-import { EWindLabel } from "../enum";
-import './playerList.css';
+import React from "react";
+import { Typography, Space, } from "antd";
+import { IPlayerList } from "../interface";
+import { OWind } from "../option";
 
-interface IPlayerList {
-    dealerNum: number;
-};
+const { Text } = Typography;
 
-const windList = [
-    'east',
-    'south',
-    'west',
-    'north'
-];
-
-const windLabelList: EWindLabel[] = [
-    EWindLabel.EAST,
-    EWindLabel.SOUTH,
-    EWindLabel.WEST,
-    EWindLabel.NORTH
-];
-
-const PlayerList = (props: IPlayerList) => {
-    const { dealerNum } = props;
-    const renderPlayerList = (dealerNum: number) => {
-        windList.forEach((value, index) => {
-            return (
-                <div className={`player ${dealerNum === index ? 'dealer' : ''}`}>
-                    <Typography.Text className='wind'>{windLabelList[index]}</Typography.Text>
-                    <Typography.Text className='player-name'>霖</Typography.Text>
-                </div>
-            )
-        });
-    };
-
+const PlayerList: React.FC<IPlayerList> = (props) => {
+    const { players, dealer } = props;
     return (
         <>
-            {renderPlayerList(dealerNum)}
+            {
+                OWind.map((wind, index) => (
+                    <Space key={`${wind.value}_${players[wind.value]}`}>
+                        {
+                            wind.value === dealer
+                                ? <Space direction='vertical'>
+                                    <Text style={{ color: 'red' }}>{OWind[index].label}</Text>
+                                    <Text style={{ color: 'red' }}>{players[wind.value]?.name}</Text>
+                                </Space>
+                                : <Space direction='vertical'>
+                                    <Text>{OWind[index].label}</Text>
+                                    <Text>{players[wind.value]?.name}</Text>
+                                </Space>
+                        }
+                    </Space>
+                ))
+            }
         </>
     )
 };

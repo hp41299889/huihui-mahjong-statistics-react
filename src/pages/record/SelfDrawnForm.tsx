@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Radio, RadioChangeEvent } from "antd";
-import { windOptions } from "../../option";
+// import { windOptions } from "../../option";
 import { EWind } from "../enum";
 import PointIntput from "./PointInput";
 
@@ -17,7 +17,7 @@ const SelfDrawnForm: React.FC = () => {
                 <Radio.Group
                     onChange={onChangeWinner}
                     value={winner}
-                    options={windOptions}
+                // options={windOptions}
                 />
             </Form.Item>
             <PointIntput />
