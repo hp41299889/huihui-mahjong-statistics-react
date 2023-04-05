@@ -9,6 +9,7 @@ const PointIntput: React.FC = () => {
             <Form.Item
                 label={'台'}
                 name={'point'}
+
             >
                 <Input
                     inputMode='numeric'

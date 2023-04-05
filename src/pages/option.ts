@@ -2,6 +2,13 @@ import { IEndTypeOption } from "./interface";
 import { EWind, EEndType } from "./enum";
 
 export const OWind = [
+    EWind.EAST,
+    EWind.SOUTH,
+    EWind.WEST,
+    EWind.NORTH
+];
+
+export const OWindLabel = [
     { label: '東', value: EWind.EAST },
     { label: '南', value: EWind.SOUTH },
     { label: '西', value: EWind.WEST },

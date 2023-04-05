@@ -2,19 +2,13 @@ import React, { useState } from "react";
 import { Form, Radio, RadioChangeEvent } from "antd";
 import { EWind } from "../enum";
 import PointIntput from "./PointInput";
-import { IPlayer, IWinningForm } from "../interface";
+import { IWinningForm } from "../interface";
 
 //TODO all option change to windList
 const WinningForm: React.FC<IWinningForm> = (props) => {
     const { players } = props;
-    const [winner, setWinner] = useState<string>('');
-    const [loser, setLoser] = useState<string>('');
-    const windPlayerMap = {
-        [EWind.EAST]: players.east?.name,
-        [EWind.SOUTH]: players.south?.name,
-        [EWind.WEST]: players.west?.name,
-        [EWind.NORTH]: players.north?.name,
-    };
+    const [winner, setWinner] = useState<EWind>(EWind.EAST);
+    const [loser, setLoser] = useState<EWind>(EWind.SOUTH);
 
     const onChangeWinner = (e: RadioChangeEvent) => {
         setWinner(e.target.value);
@@ -24,14 +18,21 @@ const WinningForm: React.FC<IWinningForm> = (props) => {
         setLoser(e.target.value);
     };
 
+    const windPlayerMap = {
+        [EWind.EAST]: players.east?.name,
+        [EWind.SOUTH]: players.south?.name,
+        [EWind.WEST]: players.west?.name,
+        [EWind.NORTH]: players.north?.name,
+    };
+
     const winnerOptions = [
-        { label: windPlayerMap[EWind.EAST], value: windPlayerMap[EWind.EAST] },
-        { label: windPlayerMap[EWind.SOUTH], value: windPlayerMap[EWind.SOUTH] },
-        { label: windPlayerMap[EWind.WEST], value: windPlayerMap[EWind.WEST] },
-        { label: windPlayerMap[EWind.NORTH], value: windPlayerMap[EWind.NORTH] },
+        { label: windPlayerMap[EWind.EAST], value: EWind.EAST },
+        { label: windPlayerMap[EWind.SOUTH], value: EWind.SOUTH },
+        { label: windPlayerMap[EWind.WEST], value: EWind.WEST },
+        { label: windPlayerMap[EWind.NORTH], value: EWind.NORTH },
     ];
 
-    const loserOptions = winnerOptions.filter(option => option.label !== winner);
+    const loserOptions = winnerOptions.filter(option => option.value !== winner);
 
     return (
         <>

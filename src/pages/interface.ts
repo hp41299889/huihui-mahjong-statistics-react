@@ -1,4 +1,4 @@
-import { EEndType, EWind } from "./enum";
+import { EEndType, EWind, EDeskType } from "./enum";
 
 //base
 export interface IPlayer {
@@ -15,12 +15,13 @@ export interface IPlayers {
 
 export interface IRound {
     roundUid: string;
-    players: IPlayers;
+    deskType: EDeskType;
     base: number;
     point: number;
+    players: IPlayers;
     circle: EWind;
     dealer: EWind;
-    deskType: string;
+    dealerCount: number;
 };
 export interface IEndTypeOption {
     label: string;

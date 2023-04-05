@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "rm -rf build && react-scripts build",
     "serve": "serve -s build",
     "docker:build": "npm run build && docker build -t hp4129889/huihui-mahjong:frontend .",
     "docker:push": "docker push hp4129889/huihui-mahjong:frontend",

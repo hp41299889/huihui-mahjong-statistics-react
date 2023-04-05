@@ -8,9 +8,9 @@ import DrawForm from "./DrawForm";
 import FakeForm from "./FakeForm";
 import { useNavigate } from "react-router-dom";
 import PlayerList from "./PlayerList";
-import { IRound, IPlayer, IRecordForm } from "../interface";
-import { EWindLabel, EEndType, EWind } from "../enum";
-import { OWind, OEndType } from "../option";
+import { IRound, IRecordForm } from "../interface";
+import { EEndType, EWind, EDeskType } from "../enum";
+import { OEndType, OWind } from "../option";
 import { windLabelMap } from "../enumMap";
 
 const { Text, Title } = Typography;
@@ -19,31 +19,27 @@ const { Text, Title } = Typography;
 const Record: React.FC = () => {
     const [round, setRound] = useState<IRound>({
         roundUid: '',
+        deskType: EDeskType.AUTO,
         base: 0,
+        point: 0,
         players: {
             east: { name: '' },
             south: { name: '' },
             west: { name: '' },
             north: { name: '' }
         },
-        point: 0,
         circle: EWind.EAST,
         dealer: EWind.EAST,
-        deskType: ''
+        dealerCount: 0
     });
-    const [players, setPlayers] = useState<IPlayer[]>([]);
-    const [circleNum, setCircleNum] = useState<number>(0);
-    const [circle, setCircle] = useState<EWind>(EWind.EAST);
-    const [dealer, setDealer] = useState<EWind>(EWind.EAST);
-
-    const [dealerNum, setDealerNum] = useState<number>(0);
-    const [dealerCount, setDealerCount] = useState<number>(0);
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
+    const navigator = useNavigate();
+
 
     const RenderForm: React.FC = () => (
         <Space>
             {endType === EEndType.WINNING && <WinningForm players={round.players} />}
-            {endType === EEndType.SELF_DRAWN && <SelfDrawnForm />}
+            {endType === EEndType.SELF_DRAWN && <SelfDrawnForm players={round.players} />}
             {endType === EEndType.DRAW && <DrawForm />}
             {endType === EEndType.FAKE && <FakeForm />}
         </Space>
@@ -53,45 +49,41 @@ const Record: React.FC = () => {
         setEndType(e.target.value);
     };
 
-    const isDealerContinue = async (value: IRecordForm) => {
-        if (value.winner === players[dealerNum].name) return true;
-        if (value.endType === EEndType.DRAW) return true;
-        if (value.endType === EEndType.FAKE) return true;
-        return false;
-    };
-
-    const isNextCircle = async (value: IRecordForm) => {
-        if (value.dealer === EWind.NORTH) return true;
-        return false;
-    };
-
-    const findNextWind = (currentWind: EWind) => {
-        const index = OWind.findIndex(wind => wind.value === currentWind)
-        return OWind[index + 1];
-    }
-
     const onSubmit = async (value: IRecordForm) => {
-        value.dealer = OWind[dealerNum].value;
+        value.endType = endType;
         console.log(value);
-        if (await isDealerContinue(value)) {
-            setDealerCount(pre => pre + 1);
-        } else {
-            setDealerCount(0);
-            if (await isNextCircle(value)) {
-                setCircleNum(pre => pre + 1);
-                setDealerNum(0);
-            } else {
-                setDealerNum(pre => pre + 1);
-            };
+        if (endType === EEndType.SELF_DRAWN) {
+            value.loser = OWind.filter(item => item !== value.winner)
         };
+        mahjongApi.post(`/record/${round.roundUid}`, value)
+            .then(res => {
+                mahjongApi.get('/round')
+                    .then(res => {
+                        const { data }: { data: IRound } = res.data;
+                        if (data.roundUid) {
+                            setRound(data);
+                        } else {
+                            navigator('/round');
+                        };
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            })
+            .catch(err => {
+                console.log(err);
+            })
     };
 
     useEffect(() => {
         mahjongApi.get('/round')
             .then(res => {
                 const { data }: { data: IRound } = res.data;
-                setRound(data);
-                // setPlayers(data.players);
+                if (data.roundUid) {
+                    setRound(data);
+                } else {
+                    navigator('/round');
+                };
             })
             .catch(err => {
                 console.log(err);
@@ -101,15 +93,15 @@ const Record: React.FC = () => {
     return (
         <Layout>
             <Title className='title'>
-                {`${windLabelMap[circle]}風${windLabelMap[dealer]}局`}
+                {`${windLabelMap[round.circle]}風${windLabelMap[round.dealer]}局`}
             </Title>
             <Text className='dealer-count'>
-                連莊:{dealerCount}
+                連莊:{round.dealerCount}
             </Text>
             <Space className='player-list'>
                 <PlayerList
                     players={round.players}
-                    dealer={dealer}
+                    dealer={round.dealer}
                 />
             </Space>
             <Space className='endType-list'>
@@ -117,7 +109,7 @@ const Record: React.FC = () => {
                     onChange={onChangeEndType}
                     value={endType}
                     options={OEndType}
-                    defaultValue={'winning'}
+                    defaultValue={EEndType.WINNING}
                 />
             </Space>
             <Form
