@@ -4,7 +4,6 @@ import { EWind } from "../enum";
 import PointIntput from "./PointInput";
 import { IWinningForm } from "../interface";
 
-//TODO all option change to windList
 const WinningForm: React.FC<IWinningForm> = (props) => {
     const { players } = props;
     const [winner, setWinner] = useState<EWind>(EWind.EAST);

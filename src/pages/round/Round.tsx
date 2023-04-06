@@ -28,6 +28,16 @@ const Round: React.FC = () => {
     );
 
     useEffect(() => {
+        mahjongApi.get('/round')
+            .then(res => {
+                console.log(res);
+                if (res.data.data.roundUid) {
+                    navigate('/record');
+                };
+            })
+            .catch(err => {
+                console.log(err);
+            });
         mahjongApi.get('/player')
             .then(res => {
                 setPlayers(res.data.data);
@@ -85,7 +95,12 @@ const Round: React.FC = () => {
                         display: 'flex',
                         justifyContent: 'end'
                     }}>
-                    <Button htmlType='submit'>Submit</Button>
+                    <Button
+                        htmlType='submit'
+                        type='primary'
+                    >
+                        Submit
+                    </Button>
                 </Form.Item>
             </Form>
         </Layout>

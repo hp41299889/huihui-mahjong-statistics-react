@@ -1,11 +1,17 @@
 import React from "react";
 import { Typography, Space, } from "antd";
-import { IPlayerList } from "../interface";
+import { IPlayers } from "../interface";
+import { EWind } from "../enum";
 import { OWindLabel } from "../option";
 
 const { Text } = Typography;
 
-const PlayerList: React.FC<IPlayerList> = (props) => {
+export interface IProps {
+    players: IPlayers;
+    dealer: EWind;
+};
+
+const PlayerList: React.FC<IProps> = (props) => {
     const { players, dealer } = props;
 
     return (

@@ -1,14 +1,22 @@
-import { Button, Form, Input, Layout } from "antd";
+import { Button, Form, Input, Layout, message } from "antd";
 import { mahjongApi } from "../../utils/request";
 import { useNavigate } from "react-router-dom";
 
-const Player = () => {
+interface IPlayerFormValue {
+    name: string;
+};
+
+const PlayerCreate: React.FC = () => {
     const navigate = useNavigate();
-    const onSubmit = (value: any) => {
-        console.log(value);
+    const onSubmit = (value: IPlayerFormValue) => {
         mahjongApi.post('/player', value)
             .then(res => {
-                navigate('/player');
+                if (res.data.status === 'success') {
+                    message.success(`新增Player：${value.name}成功！`);
+                    navigate('/player/create');
+                } else {
+                    message.error(`新增Player：${value.name}失敗！`);
+                };
             })
             .catch(err => {
                 console.log(err);
@@ -26,7 +34,7 @@ const Player = () => {
                 >
                     <Input />
                 </Form.Item>
-                <Form.Item>
+                <Form.Item style={{ display: 'flex', justifyContent: 'end' }}>
                     <Button
                         type='primary'
                         htmlType='submit'
@@ -39,4 +47,4 @@ const Player = () => {
     )
 };
 
-export default Player;
+export default PlayerCreate;

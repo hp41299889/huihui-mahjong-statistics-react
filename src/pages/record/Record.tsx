@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Radio, RadioChangeEvent, Typography, Form, Button, Space } from "antd";
+import { Layout, Radio, RadioChangeEvent, Typography, Form, Button, Space, message } from "antd";
 import { mahjongApi } from "../../utils/request";
 import './record.css';
 import WinningForm from "./WinningForm";
@@ -12,6 +12,8 @@ import { IRound, IRecordForm } from "../interface";
 import { EEndType, EWind, EDeskType } from "../enum";
 import { OEndType, OWind } from "../option";
 import { windLabelMap } from "../enumMap";
+import { useAppSelector } from "../../redux/hook";
+import { selectRecordFormSubmitDisabled } from "../../redux/mahjong";
 
 const { Text, Title } = Typography;
 
@@ -34,7 +36,7 @@ const Record: React.FC = () => {
     });
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
     const navigator = useNavigate();
-
+    const recordFormSubmitDisabled = useAppSelector(selectRecordFormSubmitDisabled);
 
     const RenderForm: React.FC = () => (
         <Space>
@@ -57,18 +59,23 @@ const Record: React.FC = () => {
         };
         mahjongApi.post(`/record/${round.roundUid}`, value)
             .then(res => {
-                mahjongApi.get('/round')
-                    .then(res => {
-                        const { data }: { data: IRound } = res.data;
-                        if (data.roundUid) {
-                            setRound(data);
-                        } else {
-                            navigator('/round');
-                        };
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
+                if (res.data.status === 'success') {
+                    message.success(`新增Record成功`);
+                    mahjongApi.get('/round')
+                        .then(res => {
+                            const { data }: { data: IRound } = res.data;
+                            if (data.roundUid) {
+                                setRound(data);
+                            } else {
+                                navigator('/round');
+                            };
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                } else {
+
+                }
             })
             .catch(err => {
                 console.log(err);
@@ -121,6 +128,7 @@ const Record: React.FC = () => {
                     <Button
                         type='primary'
                         htmlType='submit'
+                        disabled={recordFormSubmitDisabled}
                     >
                         Submit
                     </Button>

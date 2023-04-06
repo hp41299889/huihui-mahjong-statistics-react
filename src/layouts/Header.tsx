@@ -1,5 +1,5 @@
-import React, { ReactNode } from "react";
-import { Layout, Dropdown, Space, Select, Menu } from "antd";
+import React from "react";
+import { Dropdown } from "antd";
 import { DownOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Link } from "react-router-dom";
@@ -8,14 +8,18 @@ import { Link } from "react-router-dom";
 const items: MenuProps['items'] = [
     {
         key: '1',
-        label: <Link to='/player'>Player</Link>
+        label: <Link to='/player/create'>Create Player</Link>
     },
     {
         key: '2',
-        label: <Link to='/round'>Round</Link>
+        label: <Link to='/player/search'>Search Player</Link>
     },
     {
         key: '3',
+        label: <Link to='/round'>Round</Link>
+    },
+    {
+        key: '4',
         label: <Link to='/record'>Record</Link>
     },
 ];

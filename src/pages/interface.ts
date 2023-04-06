@@ -29,10 +29,7 @@ export interface IEndTypeOption {
 };
 
 //comopnent
-export interface IPlayerList {
-    players: IPlayers;
-    dealer: EWind;
-};
+
 
 export interface IRecordForm {
     endType: EEndType;
