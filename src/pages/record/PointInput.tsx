@@ -1,4 +1,4 @@
-import React, { ReactEventHandler } from "react";
+import React from "react";
 import { Form, Input } from "antd";
 import { useAppDispatch } from "../../redux/hook";
 import { setRecordFormSubmitDisabled } from "../../redux/mahjong";
