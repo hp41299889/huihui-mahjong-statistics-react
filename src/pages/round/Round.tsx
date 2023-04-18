@@ -6,12 +6,12 @@ import { IPlayer } from "../interface";
 
 const Round: React.FC = () => {
     const [players, setPlayers] = useState<IPlayer[]>([]);
-    const navigate = useNavigate();
+    const navigator = useNavigate();
 
     const onSubmit = (value: any) => {
         mahjongApi.post('/round', value)
             .then(res => {
-                navigate('/record')
+                navigator('/record')
             })
             .catch(err => {
                 console.log(err);
@@ -32,7 +32,7 @@ const Round: React.FC = () => {
             .then(res => {
                 console.log(res);
                 if (res.data.data.roundUid) {
-                    navigate('/record');
+                    navigator('/record');
                 };
             })
             .catch(err => {
@@ -45,7 +45,7 @@ const Round: React.FC = () => {
             .catch(err => {
                 console.log(err);
             });
-    }, []);
+    }, [navigator]);
 
     return (
         <Layout>

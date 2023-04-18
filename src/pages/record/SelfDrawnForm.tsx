@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Form, Radio, RadioChangeEvent } from "antd";
-// import { windOptions } from "../../option";
-import { EWind } from "../enum";
 import PointIntput from "./PointInput";
 import { IPlayers } from "../interface";
 
@@ -11,23 +9,17 @@ interface IProps {
 
 const SelfDrawnForm: React.FC<IProps> = (props) => {
     const { players } = props;
-    const [winner, setWinner] = useState<EWind>(EWind.EAST);
+    const [winner, setWinner] = useState<string>('');
 
     const onChangeWinner = (e: RadioChangeEvent) => {
         setWinner(e.target.value);
     };
 
-    const windPlayerMap = {
-        [EWind.EAST]: players.east?.name,
-        [EWind.SOUTH]: players.south?.name,
-        [EWind.WEST]: players.west?.name,
-        [EWind.NORTH]: players.north?.name,
-    };
     const winnerOptions = [
-        { label: windPlayerMap[EWind.EAST], value: EWind.EAST },
-        { label: windPlayerMap[EWind.SOUTH], value: EWind.SOUTH },
-        { label: windPlayerMap[EWind.WEST], value: EWind.WEST },
-        { label: windPlayerMap[EWind.NORTH], value: EWind.NORTH },
+        { label: players.east.name, value: players.east.name },
+        { label: players.south.name, value: players.south.name },
+        { label: players.west.name, value: players.west.name },
+        { label: players.north.name, value: players.north.name },
     ];
 
     return (

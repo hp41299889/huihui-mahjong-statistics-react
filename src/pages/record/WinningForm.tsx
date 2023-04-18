@@ -1,13 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { Form, Radio, RadioChangeEvent } from "antd";
-import { EWind } from "../enum";
 import PointIntput from "./PointInput";
 import { IWinningForm } from "../interface";
 
 const WinningForm: React.FC<IWinningForm> = (props) => {
     const { players } = props;
-    const [winner, setWinner] = useState<EWind>(EWind.EAST);
-    const [loser, setLoser] = useState<EWind>(EWind.SOUTH);
+    const [winner, setWinner] = useState<string>('');
+    const [loser, setLoser] = useState<string>('');
 
     const onChangeWinner = (e: RadioChangeEvent) => {
         setWinner(e.target.value);
@@ -17,18 +16,11 @@ const WinningForm: React.FC<IWinningForm> = (props) => {
         setLoser(e.target.value);
     };
 
-    const windPlayerMap = {
-        [EWind.EAST]: players.east?.name,
-        [EWind.SOUTH]: players.south?.name,
-        [EWind.WEST]: players.west?.name,
-        [EWind.NORTH]: players.north?.name,
-    };
-
     const winnerOptions = [
-        { label: windPlayerMap[EWind.EAST], value: players.east.name },
-        { label: windPlayerMap[EWind.SOUTH], value: players.south.name },
-        { label: windPlayerMap[EWind.WEST], value: players.west.name },
-        { label: windPlayerMap[EWind.NORTH], value: players.north.name },
+        { label: players.east.name, value: players.east.name },
+        { label: players.south.name, value: players.south.name },
+        { label: players.west.name, value: players.west.name },
+        { label: players.north.name, value: players.north.name },
     ];
 
     const loserOptions = winnerOptions.filter(option => option.value !== winner);

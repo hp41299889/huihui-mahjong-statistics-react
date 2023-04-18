@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Layout, Radio, RadioChangeEvent, Typography, Form, Button, Space, message } from "antd";
 import { mahjongApi } from "../../utils/request";
 import './record.css';
@@ -38,14 +38,16 @@ const Record: React.FC = () => {
     const navigator = useNavigate();
     const recordFormSubmitDisabled = useAppSelector(selectRecordFormSubmitDisabled);
 
-    const RenderForm: React.FC = () => (
-        <Space>
-            {endType === EEndType.WINNING && <WinningForm players={round.players} />}
-            {endType === EEndType.SELF_DRAWN && <SelfDrawnForm players={round.players} />}
-            {endType === EEndType.DRAW && <DrawForm />}
-            {endType === EEndType.FAKE && <FakeForm />}
-        </Space>
-    );
+    const renderForm = useMemo(() => {
+        return (
+            <Space>
+                {endType === EEndType.WINNING && <WinningForm players={round.players} />}
+                {endType === EEndType.SELF_DRAWN && <SelfDrawnForm players={round.players} />}
+                {endType === EEndType.DRAW && <DrawForm />}
+                {endType === EEndType.FAKE && <FakeForm />}
+            </Space>
+        )
+    }, [endType, round.players]);
 
     const onChangeEndType = (e: RadioChangeEvent) => {
         setEndType(e.target.value);
@@ -95,7 +97,7 @@ const Record: React.FC = () => {
             .catch(err => {
                 console.log(err);
             })
-    }, []);
+    }, [navigator]);
 
     return (
         <Layout>
@@ -123,7 +125,7 @@ const Record: React.FC = () => {
                 className='record-form'
                 onFinish={onSubmit}
             >
-                <RenderForm />
+                {round.players.north.name && renderForm}
                 <Form.Item>
                     <Button
                         type='primary'
