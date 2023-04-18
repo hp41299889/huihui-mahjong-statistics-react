@@ -36,9 +36,6 @@ export interface IRecordForm {
     winner: string;
     loser: string[];
     point: number;
-    circle: EWind;
-    dealer: EWind;
-    dealerCount: number;
 };
 
 export interface IWinningForm {

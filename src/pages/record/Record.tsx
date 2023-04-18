@@ -17,7 +17,7 @@ import { selectRecordFormSubmitDisabled } from "../../redux/mahjong";
 
 const { Text, Title } = Typography;
 
-
+//TODO 切換endtype時可能要重置選項
 const Record: React.FC = () => {
     const [round, setRound] = useState<IRound>({
         roundUid: '',

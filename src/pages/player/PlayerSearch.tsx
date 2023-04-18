@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Descriptions, Form, Row, Select } from 'antd';
+import { Col, Descriptions, Form, Row, Select, Table } from 'antd';
 import { useAppDispatch, useAppSelector } from 'redux/hook';
 import { fetchPlayers, selectPlayers } from 'redux/mahjong';
 import { getPlayer } from 'apis/mahjong';
 import { percent } from 'utils/math';
+import { ColumnsType } from 'antd/es/table';
 
 interface IDatas {
     rounds: number,
@@ -11,9 +12,57 @@ interface IDatas {
     wins: number,
     selfDrawns: number,
     loses: number,
-    drawn: number,
-    fake: number
+    drawns: number,
+    fakes: number
 };
+
+interface IColumn {
+    key: string;
+    total: number;
+    east: number;
+    south: number;
+    west: number;
+    north: number;
+};
+
+const columns: ColumnsType<IColumn> = [
+    {
+        title: '',
+        dataIndex: 'key',
+        rowScope: 'row'
+    },
+    {
+        title: '總計',
+        dataIndex: 'total',
+    },
+    {
+        title: '東',
+        dataIndex: 'east',
+    },
+    {
+        title: '南',
+        dataIndex: 'south',
+    },
+    {
+        title: '西',
+        dataIndex: 'west',
+    },
+    {
+        title: '北',
+        dataIndex: 'north',
+    },
+];
+
+const f: IColumn[] = [
+    {
+        key: '將數',
+        total: 30,
+        east: 7,
+        south: 7,
+        west: 8,
+        north: 8
+    }
+];
 
 const PlayerSearch: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -54,10 +103,10 @@ const PlayerSearch: React.FC = () => {
 
             {datas?.rounds &&
                 <Col span={24}>
-                    <Descriptions title={`__統計資料`} bordered column={3} size='small'>
+                    <Table columns={columns} dataSource={f} />
+                    {/* <Descriptions title={`__統計資料`} bordered column={3} size='small'>
                         <Descriptions.Item label='將數'>{datas.rounds}</Descriptions.Item>
                         <Descriptions.Item label='成績'>成績</Descriptions.Item>
-                        {/* 勝率是每將是贏或輸的比率 */}
                         <Descriptions.Item label='勝率'>勝率</Descriptions.Item>
                         <Descriptions.Item span={3} label='局數'>{datas.records}</Descriptions.Item>
                         <Descriptions.Item label='胡牌'>{datas.wins}</Descriptions.Item>
@@ -70,7 +119,7 @@ const PlayerSearch: React.FC = () => {
                         <Descriptions.Item label='流局率'>{percent(datas.drawn / datas.records * 100)}</Descriptions.Item>
                         <Descriptions.Item label='詐胡'>{datas.fake}</Descriptions.Item>
                         <Descriptions.Item label='詐胡率'>{percent(datas.fake / datas.records * 100)}</Descriptions.Item>
-                    </Descriptions>
+                    </Descriptions> */}
                 </Col>
             }
         </Row>
