@@ -12,8 +12,15 @@ interface IDatas {
     wins: number,
     selfDrawns: number,
     loses: number,
-    drawns: number,
+    draws: number,
     fakes: number
+};
+
+interface IPlayerStatistics {
+    east: IDatas
+    south: IDatas
+    west: IDatas
+    north: IDatas
 };
 
 interface IColumn {
@@ -52,28 +59,96 @@ const columns: ColumnsType<IColumn> = [
         dataIndex: 'north',
     },
 ];
-
-const f: IColumn[] = [
-    {
-        key: '將數',
-        total: 30,
-        east: 7,
-        south: 7,
-        west: 8,
-        north: 8
-    }
-];
-
+//TODO 用redux
 const PlayerSearch: React.FC = () => {
     const dispatch = useAppDispatch();
     const players = useAppSelector(selectPlayers);
-    const [datas, setDatas] = useState<IDatas>();
+    const [playerStatistics, setPlayerStatistics] = useState<IPlayerStatistics>({
+        east: {
+            rounds: 0,
+            records: 0,
+            wins: 0,
+            loses: 0,
+            selfDrawns: 0,
+            draws: 0,
+            fakes: 0
+        },
+        south: {
+            rounds: 0,
+            records: 0,
+            wins: 0,
+            loses: 0,
+            selfDrawns: 0,
+            draws: 0,
+            fakes: 0
+        },
+        west: {
+            rounds: 0,
+            records: 0,
+            wins: 0,
+            loses: 0,
+            selfDrawns: 0,
+            draws: 0,
+            fakes: 0
+        },
+        north: {
+            rounds: 0,
+            records: 0,
+            wins: 0,
+            loses: 0,
+            selfDrawns: 0,
+            draws: 0,
+            fakes: 0
+        }
+    });
+
+    const data: IColumn[] = [
+        {
+            key: '將數',
+            total: Object.values(playerStatistics).reduce((p, c) => c.rounds),
+            east: playerStatistics.east.rounds,
+            south: playerStatistics.south.rounds,
+            west: playerStatistics.west.rounds,
+            north: playerStatistics.north.rounds,
+        },
+        {
+            key: '局數',
+            total: Object.values(playerStatistics).reduce((p, c) => c.records),
+            east: playerStatistics.east.records,
+            south: playerStatistics.south.records,
+            west: playerStatistics.west.records,
+            north: playerStatistics.north.records
+        },
+        {
+            key: '胡牌',
+            total: Object.values(playerStatistics).reduce((p, c) => c.wins),
+            east: playerStatistics.east.wins,
+            south: playerStatistics.south.wins,
+            west: playerStatistics.west.wins,
+            north: playerStatistics.north.wins,
+        },
+        {
+            key: '自摸',
+            total: Object.values(playerStatistics).reduce((p, c) => c.selfDrawns),
+            east: playerStatistics.east.selfDrawns,
+            south: playerStatistics.south.selfDrawns,
+            west: playerStatistics.west.selfDrawns,
+            north: playerStatistics.north.selfDrawns,
+        },
+        {
+            key: '放槍(含被自摸)',
+            total: Object.values(playerStatistics).reduce((p, c) => c.loses),
+            east: playerStatistics.east.loses,
+            south: playerStatistics.south.loses,
+            west: playerStatistics.west.loses,
+            north: playerStatistics.north.loses
+        }
+    ];
 
     const onChange = async (value: string) => {
         const { data } = (await getPlayer(value)).data;
-        setDatas(data);
         console.log(data);
-
+        setPlayerStatistics(data);
     };
 
     const selectOptions = players.map(player => {
@@ -101,27 +176,9 @@ const PlayerSearch: React.FC = () => {
                 </Form>
             </Col>
 
-            {datas?.rounds &&
-                <Col span={24}>
-                    <Table columns={columns} dataSource={f} />
-                    {/* <Descriptions title={`__統計資料`} bordered column={3} size='small'>
-                        <Descriptions.Item label='將數'>{datas.rounds}</Descriptions.Item>
-                        <Descriptions.Item label='成績'>成績</Descriptions.Item>
-                        <Descriptions.Item label='勝率'>勝率</Descriptions.Item>
-                        <Descriptions.Item span={3} label='局數'>{datas.records}</Descriptions.Item>
-                        <Descriptions.Item label='胡牌'>{datas.wins}</Descriptions.Item>
-                        <Descriptions.Item label='胡牌率'>{percent(datas.wins / datas.records * 100)}</Descriptions.Item>
-                        <Descriptions.Item label='自摸'>{datas.selfDrawns}</Descriptions.Item>
-                        <Descriptions.Item label='自摸率'>{percent(datas.selfDrawns / datas.records * 100)}</Descriptions.Item>
-                        <Descriptions.Item label='放槍'>{datas.loses}</Descriptions.Item>
-                        <Descriptions.Item label='放槍率'>{percent(datas.loses / datas.records * 100)}</Descriptions.Item>
-                        <Descriptions.Item label='流局'>{datas.drawn}</Descriptions.Item>
-                        <Descriptions.Item label='流局率'>{percent(datas.drawn / datas.records * 100)}</Descriptions.Item>
-                        <Descriptions.Item label='詐胡'>{datas.fake}</Descriptions.Item>
-                        <Descriptions.Item label='詐胡率'>{percent(datas.fake / datas.records * 100)}</Descriptions.Item>
-                    </Descriptions> */}
-                </Col>
-            }
+            <Col span={24}>
+                <Table columns={columns} dataSource={data} />
+            </Col>
         </Row>
     )
 };
