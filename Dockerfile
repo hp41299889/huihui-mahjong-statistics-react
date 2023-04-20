@@ -1,6 +1,5 @@
-FROM node:18-alpine
-WORKDIR /app
-COPY ./build ./build
-RUN npm install -g serve
-EXPOSE 3030
-CMD ["serve", "-s", "build", "-l", "3030"]
+FROM busybox
+
+COPY build /react-app
+
+CMD ["sh", "-c", "echo 'React app static files are ready.'; sleep 1"]

@@ -26,9 +26,9 @@
     "start": "react-scripts start",
     "build": "rm -rf build && react-scripts build",
     "serve": "serve -s build",
-    "docker:build": "npm run build && docker build -t hp4129889/huihui-mahjong:frontend .",
+    "docker:build": "yarn build && docker build -t hp4129889/huihui-mahjong:frontend .",
     "docker:push": "docker push hp4129889/huihui-mahjong:frontend",
-    "dockerhub": "npm run build && npm run docker:build && npm run docker:push",
+    "dockerhub": "yarn build && npm run docker:build && npm run docker:push",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
