@@ -4,6 +4,13 @@ import { EEndType, EWind, EDeskType } from "./enum";
 export interface IPlayer {
     id?: number;
     name: string;
+    win: number;
+    lose: number;
+    selfDrawn: number;
+    beSelfDrawn: number;
+    draw: number;
+    fake: number;
+    amount: number;
     createdAt?: Date;
 };
 export interface IPlayers {

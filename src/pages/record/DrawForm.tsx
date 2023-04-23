@@ -1,7 +1,15 @@
-const DrawForm = () => {
+import React from "react";
+import { Form, Button } from "antd";
+
+const DrawForm: React.FC = () => {
     return (
         <>
-            draw form
+            流局
+            <Form.Item>
+                <Button htmlType='submit' type='primary'>
+                    Submit
+                </Button>
+            </Form.Item>
         </>
     )
 };

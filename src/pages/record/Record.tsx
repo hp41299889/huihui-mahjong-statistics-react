@@ -10,10 +10,8 @@ import { useNavigate } from "react-router-dom";
 import PlayerList from "./PlayerList";
 import { IRound, IRecordForm } from "../interface";
 import { EEndType, EWind, EDeskType } from "../enum";
-import { OEndType, OWind } from "../option";
+import { OEndType } from "../option";
 import { windLabelMap } from "../enumMap";
-import { useAppSelector } from "../../redux/hook";
-import { selectRecordFormSubmitDisabled } from "../../redux/mahjong";
 
 const { Text, Title } = Typography;
 
@@ -36,7 +34,6 @@ const Record: React.FC = () => {
     });
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
     const navigator = useNavigate();
-    const recordFormSubmitDisabled = useAppSelector(selectRecordFormSubmitDisabled);
 
     const renderForm = useMemo(() => {
         return (
@@ -54,30 +51,30 @@ const Record: React.FC = () => {
     };
 
     const onSubmit = async (value: IRecordForm) => {
+        //整理post data
         value.endType = endType;
-        console.log(value);
         if (endType === EEndType.SELF_DRAWN) {
-            value.loser = OWind.filter(item => item !== value.winner)
+            value.loser = Object.values(round.players).filter(player => player.name !== value.winner).map(item => item.name)
+        };
+        if (endType === EEndType.DRAW) {
+            value.winner = '';
+            value.loser = [];
         };
         mahjongApi.post(`/record/${round.roundUid}`, value)
             .then(res => {
-                if (res.data.status === 'success') {
-                    message.success(`新增Record成功`);
-                    mahjongApi.get('/round')
-                        .then(res => {
-                            const { data }: { data: IRound } = res.data;
-                            if (data.roundUid) {
-                                setRound(data);
-                            } else {
-                                navigator('/round');
-                            };
-                        })
-                        .catch(err => {
-                            console.log(err);
-                        })
-                } else {
-
-                }
+                message.success(`新增Record成功`);
+                mahjongApi.get('/round')
+                    .then(res => {
+                        const { data }: { data: IRound } = res.data;
+                        if (data.roundUid) {
+                            setRound(data);
+                        } else {
+                            navigator('/round');
+                        };
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
             })
             .catch(err => {
                 console.log(err);
@@ -126,15 +123,6 @@ const Record: React.FC = () => {
                 onFinish={onSubmit}
             >
                 {round.players.north.name && renderForm}
-                <Form.Item>
-                    <Button
-                        type='primary'
-                        htmlType='submit'
-                        disabled={recordFormSubmitDisabled}
-                    >
-                        Submit
-                    </Button>
-                </Form.Item>
             </Form>
         </Layout>
     )

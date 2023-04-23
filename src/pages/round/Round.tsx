@@ -30,7 +30,6 @@ const Round: React.FC = () => {
     useEffect(() => {
         mahjongApi.get('/round')
             .then(res => {
-                console.log(res);
                 if (res.data.data.roundUid) {
                     navigator('/record');
                 };

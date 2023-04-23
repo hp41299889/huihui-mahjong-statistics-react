@@ -3,7 +3,6 @@ import { Form, Input } from "antd";
 import { useAppDispatch } from "../../redux/hook";
 import { setRecordFormSubmitDisabled } from "../../redux/mahjong";
 
-//TODO 更新台數時，胡牌和放槍的選項會異常
 const PointIntput: React.FC = () => {
     const dispatch = useAppDispatch();
 

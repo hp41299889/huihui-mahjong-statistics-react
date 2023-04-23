@@ -1,12 +1,15 @@
-import React, { useMemo, useState } from "react";
-import { Form, Radio, RadioChangeEvent } from "antd";
+import React, { useEffect, useMemo, useState } from "react";
+import { Form, Radio, RadioChangeEvent, Button } from "antd";
 import PointIntput from "./PointInput";
 import { IWinningForm } from "../interface";
+import { selectRecordFormSubmitDisabled } from "redux/mahjong";
+import { useAppSelector } from "redux/hook";
 
 const WinningForm: React.FC<IWinningForm> = (props) => {
     const { players } = props;
     const [winner, setWinner] = useState<string>('');
     const [loser, setLoser] = useState<string>('');
+    const recordFormSubmitDisabled = useAppSelector(selectRecordFormSubmitDisabled);
 
     const onChangeWinner = (e: RadioChangeEvent) => {
         setWinner(e.target.value);
@@ -54,6 +57,11 @@ const WinningForm: React.FC<IWinningForm> = (props) => {
                 {renderLoserRadio}
             </Form.Item>
             <PointIntput />
+            <Form.Item>
+                <Button htmlType='submit' type='primary' disabled={recordFormSubmitDisabled}>
+                    Submit
+                </Button>
+            </Form.Item>
         </>
     )
 };
