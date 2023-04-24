@@ -17,7 +17,7 @@ const WinningForm: React.FC<IProps> = (props) => {
     };
 
     const onLoserChange = (e: RadioChangeEvent) => {
-        setLoser(e.target.value);
+        setLoser([e.target.value]);
     };
 
     const onPointChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

@@ -35,7 +35,8 @@ export interface ICurrentRound {
     circle: EWind;
     dealer: EWind;
     dealerCount: number;
-    drawCount: number;
+    records: number;
+    draws: number;
 }
 
 export interface IEndTypeOption {

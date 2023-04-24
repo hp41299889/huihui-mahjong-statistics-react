@@ -23,7 +23,6 @@ interface IColumn {
 const PlayerList: React.FC<IProps> = (props) => {
     const { currentRound } = props;
     const { east, south, west, north } = currentRound.players;
-    console.log(currentRound);
 
     const columns: ColumnsType<IColumn> = [
         {
@@ -35,26 +34,31 @@ const PlayerList: React.FC<IProps> = (props) => {
             key: 'playerList_column_win',
             title: '胡',
             dataIndex: 'win',
+            align: 'right'
         },
         {
             key: 'playerList_column_selfDrawn',
             title: '自摸',
             dataIndex: 'selfDrawn',
+            align: 'right'
         },
         {
             key: 'playerList_column_lose',
             title: '放槍',
             dataIndex: 'lose',
+            align: 'right'
         },
         {
             key: 'playerList_column_fake',
             title: '詐胡',
-            dataIndex: 'fake'
+            dataIndex: 'fake',
+            align: 'right'
         },
         {
             key: 'playerList_column_amount',
             title: '小計',
-            dataIndex: 'amount'
+            dataIndex: 'amount',
+            align: 'right'
         }
     ];
 

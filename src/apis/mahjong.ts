@@ -15,7 +15,7 @@ interface IPostRound {
     north: string;
 };
 
-interface IPostRecord {
+export interface IPostRecord {
     winner: string;
     loser: string[];
     endType: EEndType;

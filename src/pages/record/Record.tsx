@@ -16,7 +16,7 @@ import { OEndType } from "../option";
 import { windLabelMap } from "../enumMap";
 import { useAppDispatch, useAppSelector } from "redux/hook";
 import { fetchRound, selectCurrentRound } from "redux/mahjong";
-import { postRecord } from "apis/mahjong";
+import { IPostRecord, postRecord } from "apis/mahjong";
 
 const { Text } = Typography;
 
@@ -32,8 +32,8 @@ const breadcrumbItems: ItemType[] = [
 interface IRecordForm {
     endType: EEndType;
     winner: string;
-    loser: string[];
-    point: number;
+    loser: string;
+    point: string;
 };
 
 //TODO 整理前後端API格式，應該不需要送風圈風局和連莊，已經在後端計算
@@ -41,7 +41,7 @@ interface IRecordForm {
 const Record: React.FC = () => {
     const dispatch = useAppDispatch();
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
-    const navigator = useNavigate();
+    const navigate = useNavigate();
     const currentRound = useAppSelector(selectCurrentRound);
 
     const renderForm = useMemo(() => {
@@ -65,38 +65,46 @@ const Record: React.FC = () => {
         )
     }, [currentRound]);
 
+    const countRecords = () => {
+        const s = Object.values(currentRound.players);
+        // return Object.values(currentRound.players)
+    };
+
     const onChangeEndType = (e: RadioChangeEvent) => {
         setEndType(e.target.value);
     };
 
     const onSubmit = async (value: IRecordForm) => {
-        console.log(value);
-
         value.endType = endType;
-        // if(endType === EEndType.WINNING) {
-        //     value.loser = [value.loser];
-        // }
+        const transformedValue: IPostRecord = {
+            ...value,
+            loser: [value.loser],
+            point: parseInt(value.point)
+        };
+        if (endType === EEndType.WINNING) {
+            transformedValue.loser = [value.loser];
+        }
         if (endType === EEndType.SELF_DRAWN) {
-            value.loser = Object.values(currentRound.players).filter(player => player.name !== value.winner).map(item => item.name)
+            transformedValue.loser = Object.values(currentRound.players).filter(player => player.name !== value.winner).map(item => item.name)
         };
         if (endType === EEndType.DRAW) {
-            value.winner = '';
-            value.loser = [];
+            transformedValue.winner = '';
+            transformedValue.loser = [];
         };
-        await postRecord(currentRound.roundUid, value)
+        console.log(transformedValue);
+        await postRecord(currentRound.roundUid, transformedValue)
             .then(res => {
                 message.success(`新增Record成功`);
-                mahjongApi.get('/round')
+                dispatch(fetchRound())
                     .then(res => {
-                        const { data }: { data: ICurrentRound } = res.data;
-                        if (data.roundUid) {
-                            dispatch(fetchRound());
+                        if (res.payload.roundUid) {
+                            navigate('/round');
                         } else {
-                            navigator('/round');
+
+                            navigate('/round');
                         };
-                    })
-                    .catch(err => {
-                        console.error(err);
+                    }).catch(err => {
+
                     });
             })
             .catch(err => {
@@ -105,7 +113,14 @@ const Record: React.FC = () => {
 
     };
     useEffect(() => {
-        dispatch(fetchRound());
+        dispatch(fetchRound())
+            .then(res => {
+                if (res.payload === 'no round') {
+                    navigate('/round');
+                };
+            }).catch(err => {
+
+            });
     }, [dispatch]);
 
     return (
@@ -123,10 +138,11 @@ const Record: React.FC = () => {
                         連莊:{currentRound.dealerCount}
                     </Text>
                     <Text>
-                        局數:{currentRound.dealerCount}
+                        <>{countRecords()}</>
+                        局數:{currentRound.records}
                     </Text>
                     <Text>
-                        流局數:{currentRound.drawCount}
+                        流局數:{currentRound.draws}
                     </Text>
                 </Col>
                 <Col span={24}>
