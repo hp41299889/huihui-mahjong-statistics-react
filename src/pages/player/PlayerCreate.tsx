@@ -1,45 +1,82 @@
-import { Button, Form, Input, Layout, message } from "antd";
-import { mahjongApi } from "../../utils/request";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { Breadcrumb, Button, Form, Input, Layout, message } from "antd";
+import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
 
-interface IPlayerFormValue {
+import { postPlayer } from 'apis/mahjong';
+
+interface IFormValue {
     name: string;
 };
 
+const breadcrumbItems: ItemType[] = [
+    {
+        title: '玩家'
+    },
+    {
+        title: '新增玩家'
+    }
+];
+
 const PlayerCreate: React.FC = () => {
-    const navigate = useNavigate();
-    const onSubmit = (value: IPlayerFormValue) => {
-        mahjongApi.post('/player', value)
+    const [formName, setFormName] = useState<string>('');
+    const [formSubmitDisabled, setFormSubmitDisabled] = useState<boolean>(true);
+
+    const onFormSubmitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.value) {
+            setFormSubmitDisabled(false);
+        } else {
+            setFormSubmitDisabled(true);
+        };
+    };
+
+    const onFormSubmit = async (value: IFormValue) => {
+        await postPlayer(value)
             .then(res => {
                 if (res.data.status === 'success') {
                     message.success(`新增Player：${value.name}成功！`);
-                    navigate('/player/create');
+                    //TODO 新增成功後沒有清空input
+                    setFormName('');
                 } else {
                     message.error(`新增Player：${value.name}失敗！`);
+                    message.error(res.data.data);
                 };
             })
             .catch(err => {
-                console.log(err);
+                message.error(`新增Player：${value.name}失敗！`);
+                console.error(err);
             });
     };
 
     return (
         <Layout>
+            <Breadcrumb
+                items={breadcrumbItems}
+            />
             <Form
-                onFinish={onSubmit}
+                onFinish={onFormSubmit}
             >
                 <Form.Item
-                    label='名稱(一個字)'
+                    label='名稱'
                     name='name'
                 >
-                    <Input />
+                    <Input
+                        value={formName}
+                        onChange={onFormSubmitChange}
+                        placeholder='點擊輸入玩家名稱'
+                    />
                 </Form.Item>
-                <Form.Item style={{ display: 'flex', justifyContent: 'end' }}>
+                <Form.Item
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'end'
+                    }}
+                >
                     <Button
                         type='primary'
                         htmlType='submit'
+                        disabled={formSubmitDisabled}
                     >
-                        Submit
+                        送出
                     </Button>
                 </Form.Item>
             </Form>

@@ -1,5 +1,7 @@
 import { Layout } from "antd";
 import { Outlet } from "react-router-dom";
+
+import './custom.css';
 import Header from "./Header";
 
 const Base: React.FC = () => {

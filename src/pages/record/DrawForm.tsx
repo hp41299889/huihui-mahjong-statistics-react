@@ -1,13 +1,19 @@
 import React from "react";
-import { Form, Button } from "antd";
+import { Form, Button, Typography } from "antd";
 
 const DrawForm: React.FC = () => {
     return (
         <>
-            流局
-            <Form.Item>
+            <Typography.Title>流局</Typography.Title>
+            <Form.Item
+                style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'end'
+                }}
+            >
                 <Button htmlType='submit' type='primary'>
-                    Submit
+                    送出
                 </Button>
             </Form.Item>
         </>

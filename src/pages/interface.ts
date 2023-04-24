@@ -3,6 +3,7 @@ import { EEndType, EWind, EDeskType } from "./enum";
 //base
 export interface IPlayer {
     id?: number;
+    createdAt?: Date;
     name: string;
     win: number;
     lose: number;
@@ -11,7 +12,6 @@ export interface IPlayer {
     draw: number;
     fake: number;
     amount: number;
-    createdAt?: Date;
 };
 export interface IPlayers {
     east: IPlayer;
@@ -20,31 +20,25 @@ export interface IPlayers {
     north: IPlayer;
 };
 
-export interface IRound {
+export interface ICurrentRound {
     roundUid: string;
     deskType: EDeskType;
     base: number;
     point: number;
-    players: IPlayers;
+    players: {
+        [key: string]: IPlayer;
+        east: IPlayer
+        south: IPlayer
+        west: IPlayer
+        north: IPlayer
+    };
     circle: EWind;
     dealer: EWind;
     dealerCount: number;
-};
+    drawCount: number;
+}
+
 export interface IEndTypeOption {
     label: string;
     value: EEndType;
-};
-
-//comopnent
-
-
-export interface IRecordForm {
-    endType: EEndType;
-    winner: string;
-    loser: string[];
-    point: number;
-};
-
-export interface IWinningForm {
-    players: IPlayers;
 };

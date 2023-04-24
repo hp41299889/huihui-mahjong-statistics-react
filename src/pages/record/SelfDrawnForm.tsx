@@ -1,9 +1,6 @@
 import React, { useState } from "react";
-import { Form, Radio, RadioChangeEvent, Button } from "antd";
-import PointIntput from "./PointInput";
+import { Form, Radio, RadioChangeEvent, Button, Input } from "antd";
 import { IPlayers } from "../interface";
-import { selectRecordFormSubmitDisabled } from "redux/mahjong";
-import { useAppSelector } from "redux/hook";
 
 interface IProps {
     players: IPlayers;
@@ -12,10 +9,18 @@ interface IProps {
 const SelfDrawnForm: React.FC<IProps> = (props) => {
     const { players } = props;
     const [winner, setWinner] = useState<string>('');
-    const recordFormSubmitDisabled = useAppSelector(selectRecordFormSubmitDisabled);
+    const [formSubmitDisabled, setFormSubmitDisabled] = useState<boolean>(true);
 
-    const onChangeWinner = (e: RadioChangeEvent) => {
+    const onWinnerChange = (e: RadioChangeEvent) => {
         setWinner(e.target.value);
+    };
+
+    const onPointChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.value) {
+            setFormSubmitDisabled(false);
+        } else {
+            setFormSubmitDisabled(true);
+        };
     };
 
     const winnerOptions = [
@@ -29,15 +34,33 @@ const SelfDrawnForm: React.FC<IProps> = (props) => {
         <>
             <Form.Item label={'自摸'} name='winner'>
                 <Radio.Group
-                    onChange={onChangeWinner}
+                    onChange={onWinnerChange}
                     value={winner}
                     options={winnerOptions}
                 />
             </Form.Item>
-            <PointIntput />
-            <Form.Item>
-                <Button htmlType='submit' type='primary' disabled={recordFormSubmitDisabled}>
-                    Submit
+            <Form.Item
+                label={'台'}
+                name={'point'}
+            >
+                <Input
+                    inputMode='numeric'
+                    type='number'
+                    onChange={onPointChange}
+                />
+            </Form.Item>
+            <Form.Item
+                style={{
+                    display: 'flex',
+                    justifyContent: 'end'
+                }}
+            >
+                <Button
+                    htmlType='submit'
+                    type='primary'
+                    disabled={formSubmitDisabled}
+                >
+                    送出
                 </Button>
             </Form.Item>
         </>

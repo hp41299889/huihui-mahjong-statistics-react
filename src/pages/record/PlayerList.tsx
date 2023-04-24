@@ -1,28 +1,29 @@
 import React from "react";
-import { Typography, Space, Table, } from "antd";
-import { IPlayers } from "../interface";
+import { Typography, Table, } from "antd";
+import { ICurrentRound } from "../interface";
 import { EWind } from "../enum";
-import { OWindLabel } from "../option";
 import { ColumnsType } from "antd/es/table";
 
 const { Text } = Typography;
 
 interface IProps {
-    players: IPlayers;
-    dealer: EWind;
+    currentRound: ICurrentRound;
 };
 
 interface IColumn {
-    key: string;
-    total: number;
-    east: number;
-    south: number;
-    west: number;
-    north: number;
+    key: string | React.ReactNode;
+    uKey: number;
+    win: number;
+    selfDrawn: number;
+    lose: number;
+    fake: number;
+    amount: number;
 };
 
 const PlayerList: React.FC<IProps> = (props) => {
-    const { players, dealer } = props;
+    const { currentRound } = props;
+    const { east, south, west, north } = currentRound.players;
+    console.log(currentRound);
 
     const columns: ColumnsType<IColumn> = [
         {
@@ -31,48 +32,98 @@ const PlayerList: React.FC<IProps> = (props) => {
             rowScope: 'row'
         },
         {
+            key: 'playerList_column_win',
             title: '胡',
             dataIndex: 'win',
         },
         {
+            key: 'playerList_column_selfDrawn',
             title: '自摸',
             dataIndex: 'selfDrawn',
         },
         {
+            key: 'playerList_column_lose',
             title: '放槍',
             dataIndex: 'lose',
         },
         {
+            key: 'playerList_column_fake',
             title: '詐胡',
             dataIndex: 'fake'
         },
         {
+            key: 'playerList_column_amount',
             title: '小計',
             dataIndex: 'amount'
         }
     ];
 
+    const data: IColumn[] = [
+        {
+            key: <Text
+                key='playerList_data_east'
+                style={currentRound.dealer === EWind.EAST ? { color: 'red' } : {}}>
+                {`${east.name}`}
+            </Text>,
+            uKey: 0,
+            win: east.win,
+            selfDrawn: east.selfDrawn,
+            lose: east.lose,
+            fake: east.fake,
+            amount: east.amount
+        },
+        {
+            key: <Text
+                key='playerList_data_south'
+                style={currentRound.dealer === EWind.SOUTH ? { color: 'red' } : {}}>
+                {`${south.name}`}
+            </Text>,
+            uKey: 1,
+            win: south.win,
+            selfDrawn: south.selfDrawn,
+            lose: south.lose,
+            fake: south.fake,
+            amount: south.amount
+        },
+        {
+            key: <Text
+                key='playerList_data_west'
+                style={currentRound.dealer === EWind.WEST ? { color: 'red' } : {}}>
+                {`${west.name}`}
+            </Text>,
+            uKey: 2,
+            win: west.win,
+            selfDrawn: west.selfDrawn,
+            lose: west.lose,
+            fake: west.fake,
+            amount: west.amount
+        },
+        {
+            key: <Text
+                key='playerList_data_north'
+                style={currentRound.dealer === EWind.NORTH ? { color: 'red' } : {}}>
+                {`${north.name}`}
+            </Text>,
+            uKey: 3,
+            win: north.win,
+            selfDrawn: north.selfDrawn,
+            lose: north.lose,
+            fake: north.fake,
+            amount: north.amount
+        }
+    ];
+
     return (
-        <>
-            <Table />
-            {
-                OWindLabel.map((wind, index) => (
-                    <Space key={`${wind.value}_${players[wind.value]}`}>
-                        {
-                            wind.value === dealer
-                                ? <Space direction='vertical'>
-                                    <Text style={{ color: 'red' }}>{OWindLabel[index].label}</Text>
-                                    <Text style={{ color: 'red' }}>{players[wind.value]?.name}</Text>
-                                </Space>
-                                : <Space direction='vertical'>
-                                    <Text>{OWindLabel[index].label}</Text>
-                                    <Text>{players[wind.value]?.name}</Text>
-                                </Space>
-                        }
-                    </Space>
-                ))
-            }
-        </>
+        <Table
+            size='small'
+            dataSource={data}
+            columns={columns}
+            rowKey={(row) => `playerList_row_${row.uKey}`}
+            pagination={false}
+            style={{
+                width: '100%'
+            }}
+        />
     )
 };
 

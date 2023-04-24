@@ -1,20 +1,54 @@
-import React, { useState, useEffect } from "react";
-import { Button, Form, Input, Layout, Row, Col, Select } from "antd";
+import React, { useEffect } from "react";
+import { Button, Form, Input, Layout, Row, Col, Select, Breadcrumb } from "antd";
 import { useNavigate } from 'react-router-dom';
-import { mahjongApi } from "../../utils/request";
-import { IPlayer } from "../interface";
+import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
 
+import { EDeskType } from "pages/enum";
+import { useAppDispatch, useAppSelector } from "redux/hook";
+import { fetchPlayers, fetchRound, selectPlayers } from "redux/mahjong";
+import { postRound } from "apis/mahjong";
+
+const breadcrumbItems: ItemType[] = [
+    {
+        title: '將'
+    },
+    {
+        title: '新增將'
+    }
+];
+
+const deskTypeOption = [
+    {
+        label: '電動', value: EDeskType.AUTO
+    },
+    {
+        label: '手動', value: EDeskType.MANUAL
+    }
+];
+
+interface IFormValue {
+    deskType: EDeskType;
+    base: number;
+    point: number;
+    east: string;
+    south: string;
+    west: string;
+    north: string;
+};
+
+//TODO 選擇東南西北要有防呆防止選到同一個玩家
 const Round: React.FC = () => {
-    const [players, setPlayers] = useState<IPlayer[]>([]);
-    const navigator = useNavigate();
+    const dispatch = useAppDispatch();
+    const players = useAppSelector(selectPlayers);
+    const navigate = useNavigate();
 
-    const onSubmit = (value: any) => {
-        mahjongApi.post('/round', value)
+    const onSubmit = async (value: IFormValue) => {
+        await postRound(value)
             .then(res => {
-                navigator('/record')
+                navigate('/record');
             })
             .catch(err => {
-                console.log(err);
+                console.error(err);
             });
     };
 
@@ -28,42 +62,46 @@ const Round: React.FC = () => {
     );
 
     useEffect(() => {
-        mahjongApi.get('/round')
+        dispatch(fetchRound())
             .then(res => {
-                if (res.data.data.roundUid) {
-                    navigator('/record');
+                if (res.payload.roundUid) {
+                    navigate('/record');
                 };
-            })
-            .catch(err => {
-                console.log(err);
             });
-        mahjongApi.get('/player')
-            .then(res => {
-                setPlayers(res.data.data);
-            })
-            .catch(err => {
-                console.log(err);
-            });
-    }, [navigator]);
+        dispatch(fetchPlayers());
+    }, [dispatch, navigate]);
 
     return (
         <Layout>
+            <Breadcrumb items={breadcrumbItems} />
             <Form
                 onFinish={onSubmit}
+                initialValues={{
+                    base: 100,
+                    point: 20,
+                    deskType: EDeskType.AUTO
+                }}
                 style={{
                     display: 'flex',
                     flexDirection: 'column'
                 }}
             >
                 <Row>
-                    <Col span={12}>
+                    <Col span={8}>
                         <Form.Item label='底' name='base'>
                             <Input />
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
+                    <Col span={8}>
                         <Form.Item label='台' name='point'>
                             <Input />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item label='桌子' name='deskType'>
+                            <Select
+                                options={deskTypeOption}
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -98,7 +136,7 @@ const Round: React.FC = () => {
                         htmlType='submit'
                         type='primary'
                     >
-                        Submit
+                        送出
                     </Button>
                 </Form.Item>
             </Form>

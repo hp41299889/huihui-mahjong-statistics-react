@@ -1,22 +1,31 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Form, Radio, RadioChangeEvent, Button } from "antd";
-import PointIntput from "./PointInput";
-import { IWinningForm } from "../interface";
-import { selectRecordFormSubmitDisabled } from "redux/mahjong";
-import { useAppSelector } from "redux/hook";
+import React, { useMemo, useState } from "react";
+import { Form, Radio, RadioChangeEvent, Button, Input } from "antd";
+import { IPlayers } from "../interface";
 
-const WinningForm: React.FC<IWinningForm> = (props) => {
+interface IProps {
+    players: IPlayers;
+};
+
+const WinningForm: React.FC<IProps> = (props) => {
     const { players } = props;
     const [winner, setWinner] = useState<string>('');
-    const [loser, setLoser] = useState<string>('');
-    const recordFormSubmitDisabled = useAppSelector(selectRecordFormSubmitDisabled);
+    const [loser, setLoser] = useState<string[]>(['']);
+    const [formSubmitDisabled, setFormSubmitDisabled] = useState<boolean>(true);
 
-    const onChangeWinner = (e: RadioChangeEvent) => {
+    const onWinnerChange = (e: RadioChangeEvent) => {
         setWinner(e.target.value);
     };
 
-    const onChangeLoser = (e: RadioChangeEvent) => {
+    const onLoserChange = (e: RadioChangeEvent) => {
         setLoser(e.target.value);
+    };
+
+    const onPointChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (e.target.value) {
+            setFormSubmitDisabled(false);
+        } else {
+            setFormSubmitDisabled(true);
+        };
     };
 
     const winnerOptions = [
@@ -31,7 +40,7 @@ const WinningForm: React.FC<IWinningForm> = (props) => {
     const renderLoserRadio = useMemo(() => {
         return (
             <Radio.Group
-                onChange={onChangeLoser}
+                onChange={onLoserChange}
                 value={loser}
                 options={loserOptions}
             />
@@ -45,7 +54,7 @@ const WinningForm: React.FC<IWinningForm> = (props) => {
                 name={'winner'}
             >
                 <Radio.Group
-                    onChange={onChangeWinner}
+                    onChange={onWinnerChange}
                     value={winner}
                     options={winnerOptions}
                 />
@@ -56,10 +65,28 @@ const WinningForm: React.FC<IWinningForm> = (props) => {
             >
                 {renderLoserRadio}
             </Form.Item>
-            <PointIntput />
-            <Form.Item>
-                <Button htmlType='submit' type='primary' disabled={recordFormSubmitDisabled}>
-                    Submit
+            <Form.Item
+                label={'台'}
+                name={'point'}
+            >
+                <Input
+                    inputMode='numeric'
+                    type='number'
+                    onChange={onPointChange}
+                />
+            </Form.Item>
+            <Form.Item
+                style={{
+                    display: 'flex',
+                    justifyContent: 'end'
+                }}
+            >
+                <Button
+                    htmlType='submit'
+                    type='primary'
+                    disabled={formSubmitDisabled}
+                >
+                    送出
                 </Button>
             </Form.Item>
         </>
