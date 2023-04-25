@@ -47,7 +47,7 @@ const Record: React.FC = () => {
     const renderForm = useMemo(() => {
         return (
             <>
-                {currentRound.roundUid && <>
+                {<>
                     {endType === EEndType.WINNING && <WinningForm players={currentRound.players} />}
                     {endType === EEndType.SELF_DRAWN && <SelfDrawnForm players={currentRound.players} />}
                     {endType === EEndType.DRAW && <DrawForm />}
@@ -64,11 +64,6 @@ const Record: React.FC = () => {
             />
         )
     }, [currentRound]);
-
-    const countRecords = () => {
-        const s = Object.values(currentRound.players);
-        // return Object.values(currentRound.players)
-    };
 
     const onChangeEndType = (e: RadioChangeEvent) => {
         setEndType(e.target.value);
@@ -115,7 +110,7 @@ const Record: React.FC = () => {
     useEffect(() => {
         dispatch(fetchRound())
             .then(res => {
-                if (res.payload === 'no round') {
+                if (!res.payload.roundUid) {
                     navigate('/round');
                 };
             }).catch(err => {
@@ -138,15 +133,16 @@ const Record: React.FC = () => {
                         連莊:{currentRound.dealerCount}
                     </Text>
                     <Text>
-                        <>{countRecords()}</>
-                        局數:{currentRound.records}
+                        局數:{currentRound.recordCount}
                     </Text>
                     <Text>
-                        流局數:{currentRound.draws}
+                        流局數:{currentRound.drawCount}
                     </Text>
                 </Col>
                 <Col span={24}>
-                    {renderPlayerList}
+                    {currentRound.roundUid &&
+                        renderPlayerList
+                    }
                 </Col>
             </Row>
             <Space className='endType-list'>
@@ -170,7 +166,7 @@ const Record: React.FC = () => {
                         height: '100%'
                     }}
                 >
-                    {renderForm}
+                    {currentRound.roundUid && renderForm}
                 </Space>
             </Form>
         </>

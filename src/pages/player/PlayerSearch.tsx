@@ -136,12 +136,28 @@ const PlayerSearch: React.FC = () => {
             north: playerStatistics.north.selfDrawns,
         },
         {
-            key: '放槍(含被自摸)',
+            key: '放槍',
             total: Object.values(playerStatistics).reduce((p, c) => c.loses),
             east: playerStatistics.east.loses,
             south: playerStatistics.south.loses,
             west: playerStatistics.west.loses,
             north: playerStatistics.north.loses
+        },
+        {
+            key: '被自摸',
+            total: Object.values(playerStatistics).reduce((p, c) => c.loses),
+            east: 0,
+            south: 0,
+            west: 0,
+            north: 0
+        },
+        {
+            key: '小計',
+            total: 0,
+            east: 0,
+            south: 0,
+            west: 0,
+            north: 0
         }
     ];
 
@@ -177,7 +193,7 @@ const PlayerSearch: React.FC = () => {
             </Col>
 
             <Col span={24}>
-                <Table columns={columns} dataSource={data} />
+                <Table columns={columns} dataSource={data} size='small' pagination={false} />
             </Col>
         </Row>
     )

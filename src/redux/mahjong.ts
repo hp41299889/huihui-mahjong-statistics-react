@@ -61,8 +61,9 @@ const initialState: IMahjong = {
         circle: EWind.EAST,
         dealer: EWind.EAST,
         dealerCount: 0,
-        records: 0,
-        draws: 0
+        recordCount: 0,
+        drawCount: 0,
+        fakeCount: 0
     },
     players: [],
     recordFormSubmitDisabled: true
