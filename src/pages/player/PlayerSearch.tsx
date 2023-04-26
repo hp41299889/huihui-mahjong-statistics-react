@@ -7,13 +7,15 @@ import { percent } from 'utils/math';
 import { ColumnsType } from 'antd/es/table';
 
 interface IDatas {
-    rounds: number,
-    records: number,
-    wins: number,
-    selfDrawns: number,
-    loses: number,
-    draws: number,
-    fakes: number
+    rounds: number;
+    records: number;
+    win: number;
+    selfDrawn: number;
+    beSelfDrawn: number;
+    lose: number;
+    draw: number;
+    fake: number;
+    amount: number;
 };
 
 interface IPlayerStatistics {
@@ -67,38 +69,46 @@ const PlayerSearch: React.FC = () => {
         east: {
             rounds: 0,
             records: 0,
-            wins: 0,
-            loses: 0,
-            selfDrawns: 0,
-            draws: 0,
-            fakes: 0
+            win: 0,
+            lose: 0,
+            selfDrawn: 0,
+            beSelfDrawn: 0,
+            draw: 0,
+            fake: 0,
+            amount: 0
         },
         south: {
             rounds: 0,
             records: 0,
-            wins: 0,
-            loses: 0,
-            selfDrawns: 0,
-            draws: 0,
-            fakes: 0
+            win: 0,
+            lose: 0,
+            selfDrawn: 0,
+            beSelfDrawn: 0,
+            draw: 0,
+            fake: 0,
+            amount: 0
         },
         west: {
             rounds: 0,
             records: 0,
-            wins: 0,
-            loses: 0,
-            selfDrawns: 0,
-            draws: 0,
-            fakes: 0
+            win: 0,
+            lose: 0,
+            selfDrawn: 0,
+            beSelfDrawn: 0,
+            draw: 0,
+            fake: 0,
+            amount: 0
         },
         north: {
             rounds: 0,
             records: 0,
-            wins: 0,
-            loses: 0,
-            selfDrawns: 0,
-            draws: 0,
-            fakes: 0
+            win: 0,
+            lose: 0,
+            selfDrawn: 0,
+            beSelfDrawn: 0,
+            draw: 0,
+            fake: 0,
+            amount: 0
         }
     });
 
@@ -122,42 +132,42 @@ const PlayerSearch: React.FC = () => {
         {
             key: '胡牌',
             total: Object.values(playerStatistics).reduce((p, c) => c.wins),
-            east: playerStatistics.east.wins,
-            south: playerStatistics.south.wins,
-            west: playerStatistics.west.wins,
-            north: playerStatistics.north.wins,
+            east: playerStatistics.east.win,
+            south: playerStatistics.south.win,
+            west: playerStatistics.west.win,
+            north: playerStatistics.north.win,
         },
         {
             key: '自摸',
             total: Object.values(playerStatistics).reduce((p, c) => c.selfDrawns),
-            east: playerStatistics.east.selfDrawns,
-            south: playerStatistics.south.selfDrawns,
-            west: playerStatistics.west.selfDrawns,
-            north: playerStatistics.north.selfDrawns,
+            east: playerStatistics.east.selfDrawn,
+            south: playerStatistics.south.selfDrawn,
+            west: playerStatistics.west.selfDrawn,
+            north: playerStatistics.north.selfDrawn,
         },
         {
             key: '放槍',
             total: Object.values(playerStatistics).reduce((p, c) => c.loses),
-            east: playerStatistics.east.loses,
-            south: playerStatistics.south.loses,
-            west: playerStatistics.west.loses,
-            north: playerStatistics.north.loses
+            east: playerStatistics.east.lose,
+            south: playerStatistics.south.lose,
+            west: playerStatistics.west.lose,
+            north: playerStatistics.north.lose
         },
         {
             key: '被自摸',
             total: Object.values(playerStatistics).reduce((p, c) => c.loses),
-            east: 0,
-            south: 0,
-            west: 0,
-            north: 0
+            east: playerStatistics.east.beSelfDrawn,
+            south: playerStatistics.south.beSelfDrawn,
+            west: playerStatistics.west.beSelfDrawn,
+            north: playerStatistics.north.beSelfDrawn,
         },
         {
             key: '小計',
             total: 0,
-            east: 0,
-            south: 0,
-            west: 0,
-            north: 0
+            east: playerStatistics.east.amount,
+            south: playerStatistics.south.amount,
+            west: playerStatistics.west.amount,
+            north: playerStatistics.north.amount,
         }
     ];
 

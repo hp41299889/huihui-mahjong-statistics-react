@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form, Input, Layout, Row, Col, Select, Breadcrumb } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
@@ -41,6 +41,8 @@ const Round: React.FC = () => {
     const dispatch = useAppDispatch();
     const players = useAppSelector(selectPlayers);
     const navigate = useNavigate();
+    const [form] = Form.useForm();
+    console.log('render Round');
 
     const onSubmit = async (value: IFormValue) => {
         await postRound(value)
@@ -51,30 +53,53 @@ const Round: React.FC = () => {
                 console.error(err);
             });
     };
+    const onEastChange = (value: string) => {
+        if (form.getFieldValue('south') === value) form.setFieldValue('south', null);
+        if (form.getFieldValue('west') === value) form.setFieldValue('west', null);
+        if (form.getFieldValue('north') === value) form.setFieldValue('north', null);
+    };
 
-    const renderPlayerSelectOption = () => (
-        <Select
-            options={players.map(player => ({
-                value: player.name,
-                label: player.name
-            }))}
-        />
-    );
+    const onSouthChange = (value: string) => {
+        if (form.getFieldValue('east') === value) form.setFieldValue('east', null);
+        if (form.getFieldValue('west') === value) form.setFieldValue('west', null);
+        if (form.getFieldValue('north') === value) form.setFieldValue('north', null);
+    };
+
+    const onWestChange = (value: string) => {
+        if (form.getFieldValue('east') === value) form.setFieldValue('east', null);
+        if (form.getFieldValue('south') === value) form.setFieldValue('south', null);
+        if (form.getFieldValue('north') === value) form.setFieldValue('north', null);
+    };
+
+    const onNorthChange = (value: string) => {
+        if (form.getFieldValue('east') === value) form.setFieldValue('east', null);
+        if (form.getFieldValue('south') === value) form.setFieldValue('south', null);
+        if (form.getFieldValue('west') === value) form.setFieldValue('west', null);
+    };
+
+    const playerSelectOptions = players.map(player => {
+        return {
+            value: player.name,
+            label: player.name
+        };
+    });
 
     useEffect(() => {
         dispatch(fetchRound())
             .then(res => {
                 if (res.payload.roundUid) {
                     navigate('/record');
+                } else {
+                    dispatch(fetchPlayers());
                 };
             });
-        dispatch(fetchPlayers());
     }, [dispatch, navigate]);
 
     return (
         <Layout>
             <Breadcrumb items={breadcrumbItems} />
             <Form
+                form={form}
                 onFinish={onSubmit}
                 initialValues={{
                     base: 100,
@@ -108,22 +133,34 @@ const Round: React.FC = () => {
                 <Row>
                     <Col span={6}>
                         <Form.Item label='東' name='east'>
-                            {renderPlayerSelectOption()}
+                            <Select
+                                options={playerSelectOptions}
+                                onChange={onEastChange}
+                            />
                         </Form.Item>
                     </Col>
                     <Col span={6}>
                         <Form.Item label='南' name='south'>
-                            {renderPlayerSelectOption()}
+                            <Select
+                                options={playerSelectOptions}
+                                onChange={onSouthChange}
+                            />
                         </Form.Item>
                     </Col>
                     <Col span={6}>
                         <Form.Item label='西' name='west'>
-                            {renderPlayerSelectOption()}
+                            <Select
+                                options={playerSelectOptions}
+                                onChange={onWestChange}
+                            />
                         </Form.Item>
                     </Col>
                     <Col span={6}>
                         <Form.Item label='北' name='north'>
-                            {renderPlayerSelectOption()}
+                            <Select
+                                options={playerSelectOptions}
+                                onChange={onNorthChange}
+                            />
                         </Form.Item>
                     </Col>
                 </Row>

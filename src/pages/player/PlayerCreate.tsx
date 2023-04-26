@@ -18,7 +18,7 @@ const breadcrumbItems: ItemType[] = [
 ];
 
 const PlayerCreate: React.FC = () => {
-    const [formName, setFormName] = useState<string>('');
+    const [form] = Form.useForm();
     const [formSubmitDisabled, setFormSubmitDisabled] = useState<boolean>(true);
 
     const onFormSubmitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,8 +34,7 @@ const PlayerCreate: React.FC = () => {
             .then(res => {
                 if (res.data.status === 'success') {
                     message.success(`新增Player：${value.name}成功！`);
-                    //TODO 新增成功後沒有清空input
-                    setFormName('');
+                    form.resetFields();
                 } else {
                     message.error(`新增Player：${value.name}失敗！`);
                     message.error(res.data.data);
@@ -53,6 +52,7 @@ const PlayerCreate: React.FC = () => {
                 items={breadcrumbItems}
             />
             <Form
+                form={form}
                 onFinish={onFormSubmit}
             >
                 <Form.Item
@@ -60,7 +60,6 @@ const PlayerCreate: React.FC = () => {
                     name='name'
                 >
                     <Input
-                        value={formName}
                         onChange={onFormSubmitChange}
                         placeholder='點擊輸入玩家名稱'
                     />

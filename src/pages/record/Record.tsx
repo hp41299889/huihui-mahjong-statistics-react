@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Layout, Radio, RadioChangeEvent, Typography, Form, Space, message, Breadcrumb, Divider, Row, Col } from "antd";
+import { Radio, RadioChangeEvent, Typography, Form, Space, message, Breadcrumb, Divider, Row, Col } from "antd";
 import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
 
 import './record.css';
-import { mahjongApi } from "../../utils/request";
 import WinningForm from "./WinningForm";
 import SelfDrawnForm from "./SelfDrawnForm";
 import DrawForm from "./DrawForm";
 import FakeForm from "./FakeForm";
 import { useNavigate } from "react-router-dom";
 import PlayerList from "./PlayerList";
-import { ICurrentRound } from "../interface";
 import { EEndType } from "../enum";
 import { OEndType } from "../option";
 import { windLabelMap } from "../enumMap";
@@ -39,8 +37,9 @@ interface IRecordForm {
 //TODO 整理前後端API格式，應該不需要送風圈風局和連莊，已經在後端計算
 //TODO 切換endtype時可能要重置選項
 const Record: React.FC = () => {
-    const dispatch = useAppDispatch();
+    const [form] = Form.useForm();
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const currentRound = useAppSelector(selectCurrentRound);
 
@@ -67,6 +66,7 @@ const Record: React.FC = () => {
 
     const onChangeEndType = (e: RadioChangeEvent) => {
         setEndType(e.target.value);
+        form.resetFields();
     };
 
     const onSubmit = async (value: IRecordForm) => {
@@ -86,26 +86,16 @@ const Record: React.FC = () => {
             transformedValue.winner = '';
             transformedValue.loser = [];
         };
-        console.log(transformedValue);
         await postRecord(currentRound.roundUid, transformedValue)
             .then(res => {
                 message.success(`新增Record成功`);
-                dispatch(fetchRound())
-                    .then(res => {
-                        if (res.payload.roundUid) {
-                            navigate('/round');
-                        } else {
-
-                            navigate('/round');
-                        };
-                    }).catch(err => {
-
-                    });
+                dispatch(fetchRound());
             })
             .catch(err => {
                 console.error(err);
-            })
-
+            });
+        setEndType(EEndType.WINNING);
+        form.resetFields();
     };
     useEffect(() => {
         dispatch(fetchRound())
@@ -116,7 +106,7 @@ const Record: React.FC = () => {
             }).catch(err => {
 
             });
-    }, [dispatch]);
+    }, [dispatch, navigate]);
 
     return (
         <>
@@ -154,6 +144,7 @@ const Record: React.FC = () => {
                 />
             </Space>
             <Form
+                form={form}
                 className='record-form'
                 onFinish={onSubmit}
             >
