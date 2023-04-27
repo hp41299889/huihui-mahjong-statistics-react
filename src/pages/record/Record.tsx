@@ -42,6 +42,8 @@ const Record: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const currentRound = useAppSelector(selectCurrentRound);
+    console.log(currentRound);
+
 
     const renderForm = useMemo(() => {
         return (
@@ -123,10 +125,10 @@ const Record: React.FC = () => {
                         連莊:{currentRound.dealerCount}
                     </Text>
                     <Text>
-                        局數:{currentRound.recordCount}
+                        局數:{currentRound.records.length}
                     </Text>
                     <Text>
-                        流局數:{currentRound.drawCount}
+                        流局數:{currentRound.players.east.draw}
                     </Text>
                 </Col>
                 <Col span={24}>

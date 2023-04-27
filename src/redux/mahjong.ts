@@ -16,8 +16,10 @@ const initialState: IMahjong = {
         deskType: EDeskType.AUTO,
         base: 0,
         point: 0,
+        records: [],
         players: {
             east: {
+                id: 0,
                 name: '',
                 win: 0,
                 lose: 0,
@@ -28,6 +30,7 @@ const initialState: IMahjong = {
                 amount: 0
             },
             south: {
+                id: 0,
                 name: '',
                 win: 0,
                 lose: 0,
@@ -38,6 +41,7 @@ const initialState: IMahjong = {
                 amount: 0
             },
             west: {
+                id: 0,
                 name: '',
                 win: 0,
                 lose: 0,
@@ -48,6 +52,7 @@ const initialState: IMahjong = {
                 amount: 0
             },
             north: {
+                id: 0,
                 name: '',
                 win: 0,
                 lose: 0,
@@ -61,9 +66,6 @@ const initialState: IMahjong = {
         circle: EWind.EAST,
         dealer: EWind.EAST,
         dealerCount: 0,
-        recordCount: 0,
-        drawCount: 0,
-        fakeCount: 0
     },
     players: [],
     recordFormSubmitDisabled: true
