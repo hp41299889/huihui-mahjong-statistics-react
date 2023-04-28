@@ -1,7 +1,3 @@
-.title {
-    text-align: center;
-}
-
 .dealer-count {
     display: flex;
     justify-content: center;
@@ -12,29 +8,11 @@
     justify-content: center;
 }
 
-.player-list .player {
-    display: flex;
-    flex-direction: column;
-}
-
-.player-list .player.dealer {
-    display: flex;
-    flex-direction: column;
-    color: red;
-}
-
-.dealer {
-    color: red;
-}
-
 .endType-list {
     display: flex;
     justify-content: center;
 }
 
 .record-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     border: 0.5px solid;
 }

@@ -1,197 +1,168 @@
-import React, { useState, useEffect } from "react";
-import { Layout, Radio, RadioChangeEvent, Typography, Form, Button } from "antd";
-import { mahjongApi } from "../../utils/request";
+import React, { useState, useEffect, useMemo } from "react";
+import { Radio, RadioChangeEvent, Typography, Form, Space, message, Breadcrumb, Divider, Row, Col } from "antd";
+import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
+
 import './record.css';
 import WinningForm from "./WinningForm";
 import SelfDrawnForm from "./SelfDrawnForm";
 import DrawForm from "./DrawForm";
 import FakeForm from "./FakeForm";
-import { EEndType, EWindLabel, EWind } from "../../enum";
-import { IRecordForm } from "../../interface";
 import { useNavigate } from "react-router-dom";
-interface IEndType {
-    label: string;
-    value: EEndType;
+import PlayerList from "./PlayerList";
+import { EEndType } from "../enum";
+import { OEndType } from "../option";
+import { windLabelMap } from "../enumMap";
+import { useAppDispatch, useAppSelector } from "redux/hook";
+import { fetchRound, selectCurrentRound } from "redux/mahjong";
+import { IPostRecord, postRecord } from "apis/mahjong";
+
+const { Text } = Typography;
+
+const breadcrumbItems: ItemType[] = [
+    {
+        title: '局'
+    },
+    {
+        title: '新增局'
+    }
+];
+
+interface IRecordForm {
+    endType: EEndType;
+    winner: string;
+    loser: string;
+    point: string;
 };
 
-interface IWindList {
-    key: EWind;
-    label: EWindLabel;
-}
-
-export const endTypeOptions: IEndType[] = [
-    { label: '胡', value: EEndType.WINNING },
-    { label: '摸', value: EEndType.SELF_DRAWN },
-    { label: '流', value: EEndType.DRAW },
-    { label: '詐', value: EEndType.FAKE }
-];
-export const windList: IWindList[] = [
-    { key: EWind.EAST, label: EWindLabel.EAST },
-    { key: EWind.SOUTH, label: EWindLabel.SOUTH },
-    { key: EWind.WEST, label: EWindLabel.WEST },
-    { key: EWind.NORTH, label: EWindLabel.NORTH }
-];
-
+//TODO 整理前後端API格式，應該不需要送風圈風局和連莊，已經在後端計算
+//TODO 切換endtype時可能要重置選項
 const Record: React.FC = () => {
-
+    const [form] = Form.useForm();
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
-    const [circleNum, setCircleNum] = useState<number>(0);
-    const [dealerNum, setDealerNum] = useState<number>(0);
-    const [dealerCount, setDealerCount] = useState<number>(0);
-    const [roundId, setRoundId] = useState<string>('');
-    const [players, setPlayers] = useState<string[]>([]);
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const currentRound = useAppSelector(selectCurrentRound);
+    console.log(currentRound);
 
-    const renderForm = (endType: EEndType) => {
-        switch (endType) {
-            case 'winning': {
-                return <WinningForm />
-            }
 
-            case 'self-drawn': {
-                return <SelfDrawnForm />
-            }
+    const renderForm = useMemo(() => {
+        return (
+            <>
+                {<>
+                    {endType === EEndType.WINNING && <WinningForm players={currentRound.players} />}
+                    {endType === EEndType.SELF_DRAWN && <SelfDrawnForm players={currentRound.players} />}
+                    {endType === EEndType.DRAW && <DrawForm />}
+                    {endType === EEndType.FAKE && <FakeForm />}
+                </>}
+            </>
+        )
+    }, [endType, currentRound]);
 
-            case 'draw': {
-                return <DrawForm />
-            }
-
-            case 'fake': {
-                return <FakeForm />
-            }
-        };
-    };
-
-    const renderPlayerList = (dealerNum: number) => {
-        if (players.length < 1) {
-            return null;
-        } else {
-            return (
-                <>
-                    {windList.map((wind, index) => (
-                        <div
-                            style={{ display: 'flex', flexDirection: 'column' }}
-                            key={`${wind.key}_${players[index]}`}
-                        >
-                            {index === dealerNum && <>
-                                <span style={{ color: 'red' }}>{wind.label}</span>
-                                <span style={{ color: 'red' }}> {players[index]}</span>
-                            </>}
-                            {index !== dealerNum && <>
-                                <span>{wind.label}</span>
-                                <span>{players[index]}</span>
-                            </>}
-                        </div>
-                    ))}
-                </>
-            )
-        };
-    };
+    const renderPlayerList = useMemo(() => {
+        return (
+            <PlayerList
+                currentRound={currentRound}
+            />
+        )
+    }, [currentRound]);
 
     const onChangeEndType = (e: RadioChangeEvent) => {
         setEndType(e.target.value);
+        form.resetFields();
     };
-    const isDealerContinue = async (props: IRecordForm) => {
-        if (props.winner === props.dealer) {
-            return true;
-        };
-        if (props.endType === EEndType.DRAW) {
-            return true;
-        };
-        if (props.endType === EEndType.FAKE) {
-            return true;
-        }
-        return false;
-    };
-    const onSubmit = async (value: IRecordForm) => {
-        //TODO POST loser要是陣列後端才不會解析錯誤，圈數及莊家計算有誤，reload仍必須與資料庫同步
-        value.endType = endType;
-        value.dealer = dealerNum;
-        value.dealerCount = dealerCount;
-        value.circle = circleNum;
-        if (value.endType === EEndType.WINNING) {
-            //非常之古怪 Enum問題，暫時用any強制加上陣列
-            value.loser = [value.loser];
-        };
 
-        mahjongApi.post(`/record/${roundId}`, value)
+    const onSubmit = async (value: IRecordForm) => {
+        value.endType = endType;
+        const transformedValue: IPostRecord = {
+            ...value,
+            loser: [value.loser],
+            point: parseInt(value.point)
+        };
+        if (endType === EEndType.WINNING) {
+            transformedValue.loser = [value.loser];
+        }
+        if (endType === EEndType.SELF_DRAWN) {
+            transformedValue.loser = Object.values(currentRound.players).filter(player => player.name !== value.winner).map(item => item.name)
+        };
+        if (endType === EEndType.DRAW) {
+            transformedValue.winner = '';
+            transformedValue.loser = [];
+        };
+        await postRecord(currentRound.roundUid, transformedValue)
             .then(res => {
-                console.log(res);
+                message.success(`新增Record成功`);
+                dispatch(fetchRound());
             })
             .catch(err => {
-                console.log(err);
-            })
-        if (await isDealerContinue(value)) {
-            setDealerCount(preDealerCount => preDealerCount + 1);
-        } else {
-            if (dealerNum === 3) {
-                setCircleNum(preCircleNum => preCircleNum + 1);
-                setDealerNum(0);
-            } else {
-                setDealerNum(preDealerNum => preDealerNum + 1);
-                setDealerCount(0);
-            };
-        };
-        console.log(value);
+                console.error(err);
+            });
+        setEndType(EEndType.WINNING);
+        form.resetFields();
     };
-
-    const findIndex = (input: string) => {
-        const index = windList.findIndex(wind => wind.key === input);
-        return index;
-    };
-
     useEffect(() => {
-        mahjongApi.get('/round')
+        dispatch(fetchRound())
             .then(res => {
-                console.log(res.data);
-                const { uid, players, circle, dealer, dealerCount } = res.data.data;
-                if (uid) {
-                    setCircleNum(circle);
-                    setDealerNum(dealer);
-                    setDealerCount(dealerCount);
-                    setRoundId(uid);
-                    setPlayers(players);
-                } else {
+                if (!res.payload.roundUid) {
                     navigate('/round');
                 };
-            })
-            .catch(err => {
-                console.log(err);
-            })
-    }, []);
+            }).catch(err => {
+
+            });
+    }, [dispatch, navigate]);
 
     return (
-        <Layout>
-            <Typography.Title className='title'>
-                {windList[circleNum].label}風{windList[dealerNum].label}局
-            </Typography.Title>
-            <Typography.Text className='dealer-count'>連莊:{dealerCount}</Typography.Text>
-            <div className='player-list'>
-                {renderPlayerList(dealerNum)}
-            </div>
-            <div className='endType-list'>
+        <>
+            <Row className='record'>
+                <Col span={6}>
+                    <Breadcrumb items={breadcrumbItems} />
+                </Col>
+                <Col className='info' span={18}>
+                    <Text className='title' style={{ fontSize: '24px' }}>
+                        {`${windLabelMap[currentRound.circle]}風${windLabelMap[currentRound.dealer]}局`}
+                    </Text>
+                    <Divider type='vertical' />
+                    <Text>
+                        連莊:{currentRound.dealerCount}
+                    </Text>
+                    <Text>
+                        局數:{currentRound.records.length}
+                    </Text>
+                    <Text>
+                        流局數:{currentRound.players.east.draw}
+                    </Text>
+                </Col>
+                <Col span={24}>
+                    {currentRound.roundUid &&
+                        renderPlayerList
+                    }
+                </Col>
+            </Row>
+            <Space className='endType-list'>
                 <Radio.Group
                     onChange={onChangeEndType}
                     value={endType}
-                    options={endTypeOptions}
-                    defaultValue={'winning'}
+                    options={OEndType}
+                    defaultValue={EEndType.WINNING}
                 />
-            </div>
+            </Space>
             <Form
+                form={form}
                 className='record-form'
                 onFinish={onSubmit}
             >
-                {renderForm(endType)}
-                <Form.Item>
-                    <Button
-                        type='primary'
-                        htmlType='submit'
-                    >
-                        Submit
-                    </Button>
-                </Form.Item>
+                <Space
+                    direction='vertical'
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        width: '100%',
+                        height: '100%'
+                    }}
+                >
+                    {currentRound.roundUid && renderForm}
+                </Space>
             </Form>
-        </Layout>
+        </>
     )
 };
 

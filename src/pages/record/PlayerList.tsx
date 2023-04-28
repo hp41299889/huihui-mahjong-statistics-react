@@ -1,43 +1,133 @@
-import { Typography } from "antd";
-import { IRecordForm } from "../../interface";
-import { EWindLabel } from "../../enum";
-import './playerList.css';
+import React from "react";
+import { Typography, Table, } from "antd";
+import { ICurrentRound } from "../interface";
+import { EWind } from "../enum";
+import { ColumnsType } from "antd/es/table";
 
-interface IPlayerList {
-    dealerNum: number;
+const { Text } = Typography;
+
+interface IProps {
+    currentRound: ICurrentRound;
 };
 
-const windList = [
-    'east',
-    'south',
-    'west',
-    'north'
-];
+interface IColumn {
+    key: string | React.ReactNode;
+    uKey: number;
+    win: number;
+    selfDrawn: number;
+    lose: number;
+    fake: number;
+    amount: number;
+};
 
-const windLabelList: EWindLabel[] = [
-    EWindLabel.EAST,
-    EWindLabel.SOUTH,
-    EWindLabel.WEST,
-    EWindLabel.NORTH
-];
+const PlayerList: React.FC<IProps> = (props) => {
+    const { currentRound } = props;
+    const { east, south, west, north } = currentRound.players;
 
-const PlayerList = (props: IPlayerList) => {
-    const { dealerNum } = props;
-    const renderPlayerList = (dealerNum: number) => {
-        windList.forEach((value, index) => {
-            return (
-                <div className={`player ${dealerNum === index ? 'dealer' : ''}`}>
-                    <Typography.Text className='wind'>{windLabelList[index]}</Typography.Text>
-                    <Typography.Text className='player-name'>霖</Typography.Text>
-                </div>
-            )
-        });
-    };
+    const columns: ColumnsType<IColumn> = [
+        {
+            title: '',
+            dataIndex: 'key',
+            rowScope: 'row'
+        },
+        {
+            key: 'playerList_column_win',
+            title: '胡',
+            dataIndex: 'win',
+            align: 'right'
+        },
+        {
+            key: 'playerList_column_selfDrawn',
+            title: '自摸',
+            dataIndex: 'selfDrawn',
+            align: 'right'
+        },
+        {
+            key: 'playerList_column_lose',
+            title: '放槍',
+            dataIndex: 'lose',
+            align: 'right'
+        },
+        {
+            key: 'playerList_column_fake',
+            title: '詐胡',
+            dataIndex: 'fake',
+            align: 'right'
+        },
+        {
+            key: 'playerList_column_amount',
+            title: '小計',
+            dataIndex: 'amount',
+            align: 'right'
+        }
+    ];
+
+    const data: IColumn[] = [
+        {
+            key: <Text
+                key='playerList_data_east'
+                style={currentRound.dealer === EWind.EAST ? { color: 'red' } : {}}>
+                {`${east.name}`}
+            </Text>,
+            uKey: 0,
+            win: east.win,
+            selfDrawn: east.selfDrawn,
+            lose: east.lose,
+            fake: east.fake,
+            amount: east.amount
+        },
+        {
+            key: <Text
+                key='playerList_data_south'
+                style={currentRound.dealer === EWind.SOUTH ? { color: 'red' } : {}}>
+                {`${south.name}`}
+            </Text>,
+            uKey: 1,
+            win: south.win,
+            selfDrawn: south.selfDrawn,
+            lose: south.lose,
+            fake: south.fake,
+            amount: south.amount
+        },
+        {
+            key: <Text
+                key='playerList_data_west'
+                style={currentRound.dealer === EWind.WEST ? { color: 'red' } : {}}>
+                {`${west.name}`}
+            </Text>,
+            uKey: 2,
+            win: west.win,
+            selfDrawn: west.selfDrawn,
+            lose: west.lose,
+            fake: west.fake,
+            amount: west.amount
+        },
+        {
+            key: <Text
+                key='playerList_data_north'
+                style={currentRound.dealer === EWind.NORTH ? { color: 'red' } : {}}>
+                {`${north.name}`}
+            </Text>,
+            uKey: 3,
+            win: north.win,
+            selfDrawn: north.selfDrawn,
+            lose: north.lose,
+            fake: north.fake,
+            amount: north.amount
+        }
+    ];
 
     return (
-        <>
-            {renderPlayerList(dealerNum)}
-        </>
+        <Table
+            size='small'
+            dataSource={data}
+            columns={columns}
+            rowKey={(row) => `playerList_row_${row.uKey}`}
+            pagination={false}
+            style={{
+                width: '100%'
+            }}
+        />
     )
 };
 

@@ -18,3 +18,8 @@ export enum EEndType {
     DRAW = 'draw',
     FAKE = 'fake'
 };
+
+export enum EDeskType {
+    AUTO = 'auto',
+    MANUAL = 'manual'
+};

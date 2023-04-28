@@ -1,8 +1,10 @@
 import { Layout } from "antd";
 import { Outlet } from "react-router-dom";
+
+import './custom.css';
 import Header from "./Header";
 
-const Base = () => {
+const Base: React.FC = () => {
     return (
         <Layout>
             <Header />
