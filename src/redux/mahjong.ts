@@ -12,10 +12,14 @@ interface IMahjong {
 
 const initialState: IMahjong = {
     currentRound: {
-        roundUid: '',
-        deskType: EDeskType.AUTO,
-        base: 0,
-        point: 0,
+        round: {
+            uid: '',
+            createdAt: new Date().toISOString(),
+            deskType: EDeskType.AUTO,
+            base: 0,
+            point: 0,
+            records: []
+        },
         records: [],
         players: {
             east: {

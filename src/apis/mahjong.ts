@@ -17,7 +17,7 @@ interface IPostRound {
 
 export interface IPostRecord {
     winner: string;
-    loser: string[];
+    losers: string[];
     endType: EEndType;
     point: number;
 };

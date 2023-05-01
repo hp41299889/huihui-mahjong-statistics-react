@@ -20,10 +20,34 @@ export interface IPlayers {
     north: IPlayer;
 };
 
+interface IRound {
+    //generate
+    uid: string;
+    createdAt: Date | String;
+    //column
+    deskType: EDeskType;
+    base: number;
+    point: number;
+    //relation
+    east?: IPlayer;
+    south?: IPlayer;
+    west?: IPlayer;
+    north?: IPlayer;
+    records: IRecord[];
+    // updatedAt: Date;
+};
+
+interface IAddRecord {
+    winner: string;
+    losers: string[];
+    endType: EEndType;
+    point: number;
+};
+
 interface IRecord {
     //generate
     uid: string;
-    createdAt: Date;
+    createdAt: Date | String;
     //column
     circle: EWind;
     dealer: EWind;
@@ -38,31 +62,29 @@ interface IRecord {
 interface IPlayerStatistics {
     id: number;
     name: string;
-    win?: number;
-    lose?: number;
-    selfDrawn?: number;
-    beSelfDrawn?: number;
-    draw?: number;
-    fake?: number;
-    amount?: number;
+    win: number;
+    lose: number;
+    selfDrawn: number;
+    draw: number;
+    beSelfDrawn: number;
+    fake: number;
+    amount: number;
 };
 
 export interface ICurrentRound {
-    roundUid: string;
-    deskType: EDeskType;
-    base: number;
-    point: number;
-    records: IRecord[];
+    round: IRound;
+    records: IAddRecord[];
     players: {
-        east: IPlayer;
-        south: IPlayer;
-        west: IPlayer;
-        north: IPlayer;
+        [key: string]: IPlayerStatistics;
+        east: IPlayerStatistics;
+        south: IPlayerStatistics;
+        west: IPlayerStatistics;
+        north: IPlayerStatistics;
     };
     circle: EWind;
     dealer: EWind;
     dealerCount: number;
-}
+};
 
 export interface IEndTypeOption {
     label: string;

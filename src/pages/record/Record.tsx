@@ -30,7 +30,7 @@ const breadcrumbItems: ItemType[] = [
 interface IRecordForm {
     endType: EEndType;
     winner: string;
-    loser: string;
+    losers: string;
     point: string;
 };
 
@@ -42,6 +42,7 @@ const Record: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const currentRound = useAppSelector(selectCurrentRound);
+    const { round, circle, dealer, dealerCount, players, records } = currentRound;
     console.log(currentRound);
 
 
@@ -75,20 +76,20 @@ const Record: React.FC = () => {
         value.endType = endType;
         const transformedValue: IPostRecord = {
             ...value,
-            loser: [value.loser],
+            losers: [value.losers],
             point: parseInt(value.point)
         };
         if (endType === EEndType.WINNING) {
-            transformedValue.loser = [value.loser];
+            transformedValue.losers = [value.losers];
         }
         if (endType === EEndType.SELF_DRAWN) {
-            transformedValue.loser = Object.values(currentRound.players).filter(player => player.name !== value.winner).map(item => item.name)
+            transformedValue.losers = Object.values(currentRound.players).filter(player => player.name !== value.winner).map(item => item.name)
         };
         if (endType === EEndType.DRAW) {
             transformedValue.winner = '';
-            transformedValue.loser = [];
+            transformedValue.losers = [];
         };
-        await postRecord(currentRound.roundUid, transformedValue)
+        await postRecord(round.uid, transformedValue)
             .then(res => {
                 message.success(`新增Record成功`);
                 dispatch(fetchRound());
@@ -102,7 +103,9 @@ const Record: React.FC = () => {
     useEffect(() => {
         dispatch(fetchRound())
             .then(res => {
-                if (!res.payload.roundUid) {
+                const { round } = res.payload;
+                const { uid } = round;
+                if (!uid) {
                     navigate('/round');
                 };
             }).catch(err => {
@@ -118,21 +121,21 @@ const Record: React.FC = () => {
                 </Col>
                 <Col className='info' span={18}>
                     <Text className='title' style={{ fontSize: '24px' }}>
-                        {`${windLabelMap[currentRound.circle]}風${windLabelMap[currentRound.dealer]}局`}
+                        {`${windLabelMap[circle]}風${windLabelMap[dealer]}局`}
                     </Text>
                     <Divider type='vertical' />
                     <Text>
-                        連莊:{currentRound.dealerCount}
+                        連莊:{dealerCount}
                     </Text>
                     <Text>
-                        局數:{currentRound.records.length}
+                        局數:{records.length}
                     </Text>
                     <Text>
-                        流局數:{currentRound.players.east.draw}
+                        流局數:{players.east.draw}
                     </Text>
                 </Col>
                 <Col span={24}>
-                    {currentRound.roundUid &&
+                    {round.uid &&
                         renderPlayerList
                     }
                 </Col>
@@ -159,7 +162,7 @@ const Record: React.FC = () => {
                         height: '100%'
                     }}
                 >
-                    {currentRound.roundUid && renderForm}
+                    {round.uid && renderForm}
                 </Space>
             </Form>
         </>

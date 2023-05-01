@@ -61,7 +61,7 @@ const WinningForm: React.FC<IProps> = (props) => {
             </Form.Item>
             <Form.Item
                 label={'放槍'}
-                name={'loser'}
+                name={'losers'}
             >
                 {renderLoserRadio}
             </Form.Item>
