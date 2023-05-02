@@ -1,4 +1,4 @@
-import { EEndType, EWind, EDeskType } from "./enum";
+import { EEndType, EWind, EDeskType, ERoundStatus } from "./enum";
 
 //base
 export interface IPlayer {
@@ -37,7 +37,10 @@ interface IRound {
     // updatedAt: Date;
 };
 
-interface IAddRecord {
+export interface IAddRecord {
+    circle: EWind;
+    dealer: EWind;
+    dealerCount: number;
     winner: string;
     losers: string[];
     endType: EEndType;
@@ -72,6 +75,7 @@ interface IPlayerStatistics {
 };
 
 export interface ICurrentRound {
+    status: ERoundStatus;
     round: IRound;
     records: IAddRecord[];
     players: {

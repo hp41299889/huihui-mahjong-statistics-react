@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from './store';
 import { getPlayers, getRound } from 'apis/mahjong';
 import { ICurrentRound, IPlayer } from 'pages/interface';
-import { EDeskType, EWind } from 'pages/enum';
+import { EDeskType, ERoundStatus, EWind } from 'pages/enum';
 
 interface IMahjong {
     currentRound: ICurrentRound;
@@ -12,6 +12,7 @@ interface IMahjong {
 
 const initialState: IMahjong = {
     currentRound: {
+        status: ERoundStatus.EMPTY,
         round: {
             uid: '',
             createdAt: new Date().toISOString(),

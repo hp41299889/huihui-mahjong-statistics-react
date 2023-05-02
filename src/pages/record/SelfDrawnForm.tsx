@@ -4,24 +4,11 @@ import { IPlayers } from "../interface";
 
 interface IProps {
     players: IPlayers;
+    submitDisabled: boolean;
 };
 
 const SelfDrawnForm: React.FC<IProps> = (props) => {
-    const { players } = props;
-    const [winner, setWinner] = useState<string>('');
-    const [formSubmitDisabled, setFormSubmitDisabled] = useState<boolean>(true);
-
-    const onWinnerChange = (e: RadioChangeEvent) => {
-        setWinner(e.target.value);
-    };
-
-    const onPointChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.value) {
-            setFormSubmitDisabled(false);
-        } else {
-            setFormSubmitDisabled(true);
-        };
-    };
+    const { players, submitDisabled } = props;
 
     const winnerOptions = [
         { label: players.east.name, value: players.east.name },
@@ -34,8 +21,6 @@ const SelfDrawnForm: React.FC<IProps> = (props) => {
         <>
             <Form.Item label={'自摸'} name='winner'>
                 <Radio.Group
-                    onChange={onWinnerChange}
-                    value={winner}
                     options={winnerOptions}
                 />
             </Form.Item>
@@ -46,7 +31,6 @@ const SelfDrawnForm: React.FC<IProps> = (props) => {
                 <Input
                     inputMode='numeric'
                     type='number'
-                    onChange={onPointChange}
                 />
             </Form.Item>
             <Form.Item
@@ -58,7 +42,7 @@ const SelfDrawnForm: React.FC<IProps> = (props) => {
                 <Button
                     htmlType='submit'
                     type='primary'
-                    disabled={formSubmitDisabled}
+                    disabled={submitDisabled}
                 >
                     送出
                 </Button>

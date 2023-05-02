@@ -3,7 +3,7 @@ import { Button, Form, Input, Layout, Row, Col, Select, Breadcrumb } from "antd"
 import { useNavigate } from 'react-router-dom';
 import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
 
-import { EDeskType } from "pages/enum";
+import { EDeskType, ERoundStatus } from "pages/enum";
 import { useAppDispatch, useAppSelector } from "redux/hook";
 import { fetchPlayers, fetchRound, selectPlayers } from "redux/mahjong";
 import { postRound } from "apis/mahjong";
@@ -36,23 +36,21 @@ interface IFormValue {
     north: string;
 };
 
-//TODO 選擇東南西北要有防呆防止選到同一個玩家
 const Round: React.FC = () => {
+    const [form] = Form.useForm();
+    const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
+
     const dispatch = useAppDispatch();
     const players = useAppSelector(selectPlayers);
     const navigate = useNavigate();
-    const [form] = Form.useForm();
-    console.log('render Round');
 
-    const onSubmit = async (value: IFormValue) => {
-        await postRound(value)
-            .then(res => {
-                navigate('/record');
-            })
-            .catch(err => {
-                console.error(err);
-            });
-    };
+    const playerSelectOptions = players.map(player => {
+        return {
+            value: player.name,
+            label: player.name
+        };
+    });
+
     const onEastChange = (value: string) => {
         if (form.getFieldValue('south') === value) form.setFieldValue('south', null);
         if (form.getFieldValue('west') === value) form.setFieldValue('west', null);
@@ -77,17 +75,29 @@ const Round: React.FC = () => {
         if (form.getFieldValue('west') === value) form.setFieldValue('west', null);
     };
 
-    const playerSelectOptions = players.map(player => {
-        return {
-            value: player.name,
-            label: player.name
-        };
-    });
+    const onCheckForm = () => {
+        const values = form.getFieldsValue(['east', 'south', 'west', 'north']);
+        const uniqueValues = new Set(Object.values(values));
+        const hasDuplicates = uniqueValues.size !== Object.keys(values).length;
+        const allFieldsHaveValue = Object.values(values).every(value => !!value);
+        setSubmitDisabled(!allFieldsHaveValue || hasDuplicates);
+    };
+
+    const onSubmit = async (value: IFormValue) => {
+        await postRound(value)
+            .then(res => {
+                navigate('/record');
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    };
 
     useEffect(() => {
         dispatch(fetchRound())
             .then(res => {
-                if (res.payload.roundUid) {
+                const { status } = res.payload;
+                if (status === ERoundStatus.IN_PROGRESS || status === ERoundStatus.END) {
                     navigate('/record');
                 } else {
                     dispatch(fetchPlayers());
@@ -101,6 +111,7 @@ const Round: React.FC = () => {
             <Form
                 form={form}
                 onFinish={onSubmit}
+                onFieldsChange={onCheckForm}
                 initialValues={{
                     base: 100,
                     point: 20,
@@ -172,6 +183,7 @@ const Round: React.FC = () => {
                     <Button
                         htmlType='submit'
                         type='primary'
+                        disabled={submitDisabled}
                     >
                         送出
                     </Button>

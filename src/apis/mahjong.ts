@@ -44,7 +44,15 @@ export const postRound = async (data: IPostRound) => {
     return await mahjongApi.post('/round', data);
 };
 
+export const postResetCurrentRound = async () => {
+    return await mahjongApi.post('/round/reset');
+};
+
 //record
 export const postRecord = async (roundUid: string, data: IPostRecord) => {
     return await mahjongApi.post(`/record/${roundUid}`, data);
+};
+
+export const deleteLastRecord = async (roundUid: string) => {
+    return await mahjongApi.delete(`/record/${roundUid}`);
 };
