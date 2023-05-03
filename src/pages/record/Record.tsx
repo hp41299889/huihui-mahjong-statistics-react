@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Radio, RadioChangeEvent, Typography, Form, Space, message, Breadcrumb, Divider, Row, Col, Button, List, Modal } from "antd";
+import { Radio, RadioChangeEvent, Typography, Form, Space, message, Breadcrumb, Divider, Row, Col, Button, List, Modal, Tag } from "antd";
 import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
 
 import './record.css';
@@ -15,7 +15,6 @@ import { windLabelMap } from "../enumMap";
 import { useAppDispatch, useAppSelector } from "redux/hook";
 import { fetchRound, selectCurrentRound } from "redux/mahjong";
 import { IPostRecord, deleteLastRecord, postRecord, postResetCurrentRound } from "apis/mahjong";
-import { IAddRecord } from "pages/interface";
 
 const { Text } = Typography;
 
@@ -47,7 +46,7 @@ const Record: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const currentRound = useAppSelector(selectCurrentRound);
-    const { status, round, circle, dealer, dealerCount, players, records } = currentRound;
+    const { status, round, circle, dealer, dealerCount, players, records, venue } = currentRound;
 
     const isRoundEmpty = (status: ERoundStatus) => {
         return status === ERoundStatus.EMPTY;
@@ -66,6 +65,15 @@ const Record: React.FC = () => {
         )
     };
 
+    const renderVenue = venue.map((record, index) => {
+        const { circle, dealer, dealerCount, winner, } = record;
+        return (
+            <Tag key={`venueTag_${index}`} color='blue'>
+                {windLabelMap[circle]}風{windLabelMap[dealer]}局連{dealerCount}{winner}
+            </Tag>
+        )
+    });
+
     const renderPlayerList = useMemo(() => {
         return (
             <PlayerList
@@ -76,25 +84,36 @@ const Record: React.FC = () => {
 
     const recordsListDatas = records.map((record, index) => {
         const { circle, dealer, dealerCount, winner, losers, endType, point } = record;
-        let item = `${index + 1}. ${windLabelMap[circle]}風${windLabelMap[dealer]}局:連莊${dealerCount};`;
+        const winnerNode = <Tag color='cyan'>{winner}</Tag>;
+        const loserNode = <Tag color='magenta'>{losers}</Tag>
+        const pointNode = <Tag color='orange'>{point}台</Tag>
+        let event: React.ReactNode;
         switch (endType) {
             case EEndType.WINNING: {
-                item += `${winner}胡${losers[0]}${point}台`;
+                event = <>{winnerNode}<Tag color='volcano'>胡</Tag>{loserNode}{pointNode}</>;
                 break;
             }
             case EEndType.SELF_DRAWN: {
-                item += `${winner}自摸${point}台`;
+                event = <>{winnerNode}<Tag color='volcano'>自摸</Tag>{pointNode}</>;
                 break;
             }
             case EEndType.DRAW: {
-                item += `流局`;
+                event = <Tag color='yellow'>流局</Tag>
                 break;
             }
             case EEndType.FAKE: {
                 break;
             }
         };
-        return item;
+        return (
+            <List.Item style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                {index + 1}
+                <Divider type='vertical' />
+                <Tag color='blue'>{windLabelMap[circle]}風{windLabelMap[dealer]}局</Tag>
+                <Tag color='purple'>連{dealerCount}</Tag>
+                {event}
+            </List.Item>
+        );
     });
 
     const showDeleteLastRecordModal = () => {
@@ -204,16 +223,23 @@ const Record: React.FC = () => {
                         {`${windLabelMap[circle]}風${windLabelMap[dealer]}局`}
                     </Text>
                     <Divider type='vertical' />
-                    <Text>
-                        連莊:{isRoundEmpty(status) ? 0 : dealerCount}
-                    </Text>
-                    <Text>
-                        局數:{isRoundEmpty(status) ? 0 : records.length}
-                    </Text>
-                    <Text>
-                        流局數:{isRoundEmpty(status) ? 0 : players.east.draw}
-                    </Text>
+                    <Space>
+                        <Text>
+                            連莊:{isRoundEmpty(status) ? 0 : dealerCount}
+                        </Text>
+                        <Text>
+                            局數:{isRoundEmpty(status) ? 0 : records.length}
+                        </Text>
+                        <Text>
+                            流局數:{isRoundEmpty(status) ? 0 : players.east.draw}
+                        </Text>
+                    </Space>
                 </Col>
+
+                <Col span={24}>
+                    繳東:{renderVenue}
+                </Col>
+
                 <Col span={24}>
                     {!isRoundEmpty(status) && renderPlayerList}
                 </Col>
@@ -287,7 +313,7 @@ const Record: React.FC = () => {
                 size='small'
                 dataSource={recordsListDatas}
                 bordered
-                renderItem={(item) => <List.Item>{item}</List.Item>}
+                renderItem={(item, index) => item}
             />
         </>
     )

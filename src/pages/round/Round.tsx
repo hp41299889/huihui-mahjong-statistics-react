@@ -5,7 +5,7 @@ import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
 
 import { EDeskType, ERoundStatus } from "pages/enum";
 import { useAppDispatch, useAppSelector } from "redux/hook";
-import { fetchPlayers, fetchRound, selectPlayers } from "redux/mahjong";
+import { fetchStatistics, fetchRound, selectStatistics } from "redux/mahjong";
 import { postRound } from "apis/mahjong";
 
 const breadcrumbItems: ItemType[] = [
@@ -41,15 +41,12 @@ const Round: React.FC = () => {
     const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
 
     const dispatch = useAppDispatch();
-    const players = useAppSelector(selectPlayers);
+    const statistics = useAppSelector(selectStatistics);
     const navigate = useNavigate();
+    console.log(statistics);
 
-    const playerSelectOptions = players.map(player => {
-        return {
-            value: player.name,
-            label: player.name
-        };
-    });
+
+    const playerSelectOptions = Object.keys(statistics).map(player => ({ value: player, label: player }));
 
     const onEastChange = (value: string) => {
         if (form.getFieldValue('south') === value) form.setFieldValue('south', null);
@@ -100,7 +97,7 @@ const Round: React.FC = () => {
                 if (status === ERoundStatus.IN_PROGRESS || status === ERoundStatus.END) {
                     navigate('/record');
                 } else {
-                    dispatch(fetchPlayers());
+                    dispatch(fetchStatistics());
                 };
             });
     }, [dispatch, navigate]);

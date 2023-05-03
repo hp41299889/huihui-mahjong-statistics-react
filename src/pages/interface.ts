@@ -1,5 +1,76 @@
 import { EEndType, EWind, EDeskType, ERoundStatus } from "./enum";
 
+export interface ICurrentRound {
+    status: ERoundStatus;
+    round: IRound;
+    records: IAddRecord[];
+    players: IPlayers;
+    circle: EWind;
+    dealer: EWind;
+    dealerCount: number;
+    venue: IAddRecord[];
+};
+
+export interface IPlayers {
+    [key: string]: IPlayerScore;
+    east: IPlayerScore;
+    south: IPlayerScore;
+    west: IPlayerScore;
+    north: IPlayerScore;
+};
+
+export interface IAddRecord {
+    circle: EWind;
+    dealer: EWind;
+    dealerCount: number;
+    winner: string;
+    losers: string[];
+    endType: EEndType;
+    point: number;
+    createdAt: Date;
+};
+
+interface IPlayerScore {
+    id: number;
+    name: string;
+    win: number;
+    lose: number;
+    selfDrawn: number;
+    draw: number;
+    beSelfDrawn?: number;
+    fake: number;
+    amount: number;
+};
+
+export interface IStatistics {
+    [key: string]: IPlayerStatistics;
+};
+
+export interface IPlayerStatistics {
+    id: number;
+    name: string;
+    createdAt?: Date;
+    winds: {
+        [key: string]: IWindStatistics;
+        east: IWindStatistics;
+        south: IWindStatistics;
+        west: IWindStatistics;
+        north: IWindStatistics;
+    };
+};
+
+interface IWindStatistics {
+    round: number;
+    record: number;
+    win: number;
+    lose: number;
+    selfDrawn: number;
+    draw: number;
+    beSelfDrawn: number;
+    fake: number;
+    amount: number;
+};
+
 //base
 export interface IPlayer {
     id?: number;
@@ -13,12 +84,8 @@ export interface IPlayer {
     fake: number;
     amount: number;
 };
-export interface IPlayers {
-    east: IPlayer;
-    south: IPlayer;
-    west: IPlayer;
-    north: IPlayer;
-};
+
+
 
 interface IRound {
     //generate
@@ -37,15 +104,6 @@ interface IRound {
     // updatedAt: Date;
 };
 
-export interface IAddRecord {
-    circle: EWind;
-    dealer: EWind;
-    dealerCount: number;
-    winner: string;
-    losers: string[];
-    endType: EEndType;
-    point: number;
-};
 
 interface IRecord {
     //generate
@@ -62,33 +120,7 @@ interface IRecord {
     losers: IPlayer[];
 };
 
-interface IPlayerStatistics {
-    id: number;
-    name: string;
-    win: number;
-    lose: number;
-    selfDrawn: number;
-    draw: number;
-    beSelfDrawn: number;
-    fake: number;
-    amount: number;
-};
 
-export interface ICurrentRound {
-    status: ERoundStatus;
-    round: IRound;
-    records: IAddRecord[];
-    players: {
-        [key: string]: IPlayerStatistics;
-        east: IPlayerStatistics;
-        south: IPlayerStatistics;
-        west: IPlayerStatistics;
-        north: IPlayerStatistics;
-    };
-    circle: EWind;
-    dealer: EWind;
-    dealerCount: number;
-};
 
 export interface IEndTypeOption {
     label: string;

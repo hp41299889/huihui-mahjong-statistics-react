@@ -1,4 +1,4 @@
-import { EDeskType, EEndType, EWind } from 'pages/enum';
+import { EDeskType, EEndType } from 'pages/enum';
 import { mahjongApi } from 'utils/request';
 
 interface IPostPlayer {
@@ -31,8 +31,8 @@ export const getPlayers = async () => {
     return await mahjongApi.get('/player');
 };
 
-export const getPlayer = async (name: string) => {
-    return await mahjongApi.get(`/player/${name}`);
+export const getPlayerStatistics = async () => {
+    return await mahjongApi.get('/player/statistics');
 };
 
 //round
