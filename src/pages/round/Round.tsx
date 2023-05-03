@@ -43,8 +43,6 @@ const Round: React.FC = () => {
     const dispatch = useAppDispatch();
     const statistics = useAppSelector(selectStatistics);
     const navigate = useNavigate();
-    console.log(statistics);
-
 
     const playerSelectOptions = statistics ? Object.keys(statistics).map(player => ({ value: player, label: player })) : [];
 
