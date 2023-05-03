@@ -1,21 +1,25 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from './store';
-import { getPlayers, getRound } from 'apis/mahjong';
-import { ICurrentRound, IPlayer } from 'pages/interface';
-import { EDeskType, EWind } from 'pages/enum';
+import { getPlayerStatistics, getRound } from 'apis/mahjong';
+import { ICurrentRound, IStatistics } from 'pages/interface';
+import { EDeskType, ERoundStatus, EWind } from 'pages/enum';
 
 interface IMahjong {
     currentRound: ICurrentRound;
-    players: IPlayer[];
-    recordFormSubmitDisabled: boolean;
+    statistics: IStatistics;
 };
 
 const initialState: IMahjong = {
     currentRound: {
-        roundUid: '',
-        deskType: EDeskType.AUTO,
-        base: 0,
-        point: 0,
+        status: ERoundStatus.EMPTY,
+        round: {
+            uid: '',
+            createdAt: new Date().toISOString(),
+            deskType: EDeskType.AUTO,
+            base: 0,
+            point: 0,
+            records: []
+        },
         records: [],
         players: {
             east: {
@@ -66,9 +70,9 @@ const initialState: IMahjong = {
         circle: EWind.EAST,
         dealer: EWind.EAST,
         dealerCount: 0,
+        venue: []
     },
-    players: [],
-    recordFormSubmitDisabled: true
+    statistics: {}
 }
 
 export const fetchRound = createAsyncThunk(
@@ -78,10 +82,10 @@ export const fetchRound = createAsyncThunk(
     }
 );
 
-export const fetchPlayers = createAsyncThunk(
-    '/mahjong/fetchPlayers',
+export const fetchStatistics = createAsyncThunk(
+    '/mahjong/fetchStatistics',
     async () => {
-        return (await getPlayers()).data.data;
+        return (await getPlayerStatistics()).data.data;
     }
 );
 
@@ -89,14 +93,11 @@ export const slice = createSlice({
     name: 'mahjong',
     initialState,
     reducers: {
-        setRecordFormSubmitDisabled: (state, action) => {
-            state.recordFormSubmitDisabled = action.payload;
-        }
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchPlayers.fulfilled, (state, action) => {
-                state.players = action.payload;
+            .addCase(fetchStatistics.fulfilled, (state, action) => {
+                state.statistics = action.payload;
             })
             .addCase(fetchRound.fulfilled, (state, action) => {
                 state.currentRound = action.payload;
@@ -104,18 +105,12 @@ export const slice = createSlice({
     }
 });
 
-export const { setRecordFormSubmitDisabled } = slice.actions;
-
 export const selectCurrentRound = (state: RootState) => {
     return state.mahjong.currentRound;
-}
-
-export const selectRecordFormSubmitDisabled = (state: RootState) => {
-    return state.mahjong.recordFormSubmitDisabled;
 };
 
-export const selectPlayers = (state: RootState) => {
-    return state.mahjong.players;
+export const selectStatistics = (state: RootState) => {
+    return state.mahjong.statistics;
 };
 
 export default slice.reducer;

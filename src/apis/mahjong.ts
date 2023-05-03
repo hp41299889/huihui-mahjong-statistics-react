@@ -1,4 +1,4 @@
-import { EDeskType, EEndType, EWind } from 'pages/enum';
+import { EDeskType, EEndType } from 'pages/enum';
 import { mahjongApi } from 'utils/request';
 
 interface IPostPlayer {
@@ -17,7 +17,7 @@ interface IPostRound {
 
 export interface IPostRecord {
     winner: string;
-    loser: string[];
+    losers: string[];
     endType: EEndType;
     point: number;
 };
@@ -31,8 +31,8 @@ export const getPlayers = async () => {
     return await mahjongApi.get('/player');
 };
 
-export const getPlayer = async (name: string) => {
-    return await mahjongApi.get(`/player/${name}`);
+export const getPlayerStatistics = async () => {
+    return await mahjongApi.get('/player/statistics');
 };
 
 //round
@@ -44,7 +44,15 @@ export const postRound = async (data: IPostRound) => {
     return await mahjongApi.post('/round', data);
 };
 
+export const postResetCurrentRound = async () => {
+    return await mahjongApi.post('/round/reset');
+};
+
 //record
 export const postRecord = async (roundUid: string, data: IPostRecord) => {
     return await mahjongApi.post(`/record/${roundUid}`, data);
+};
+
+export const deleteLastRecord = async (roundUid: string) => {
+    return await mahjongApi.delete(`/record/${roundUid}`);
 };

@@ -1,29 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Descriptions, Form, Row, Select, Table } from 'antd';
+import { Col, Form, Row, Select, Table } from 'antd';
 import { useAppDispatch, useAppSelector } from 'redux/hook';
-import { fetchPlayers, selectPlayers } from 'redux/mahjong';
-import { getPlayer } from 'apis/mahjong';
-import { percent } from 'utils/math';
+import { fetchStatistics, selectStatistics } from 'redux/mahjong';
 import { ColumnsType } from 'antd/es/table';
-
-interface IDatas {
-    rounds: number;
-    records: number;
-    win: number;
-    selfDrawn: number;
-    beSelfDrawn: number;
-    lose: number;
-    draw: number;
-    fake: number;
-    amount: number;
-};
-
-interface IPlayerStatistics {
-    east: IDatas
-    south: IDatas
-    west: IDatas
-    north: IDatas
-};
+import { IPlayerStatistics } from 'pages/interface';
 
 interface IColumn {
     key: string;
@@ -43,149 +23,213 @@ const columns: ColumnsType<IColumn> = [
     {
         title: '總計',
         dataIndex: 'total',
+        align: 'right'
     },
     {
         title: '東',
         dataIndex: 'east',
+        align: 'right'
     },
     {
         title: '南',
         dataIndex: 'south',
+        align: 'right'
     },
     {
         title: '西',
         dataIndex: 'west',
+        align: 'right'
     },
     {
         title: '北',
         dataIndex: 'north',
+        align: 'right'
     },
 ];
 //TODO 用redux
 const PlayerSearch: React.FC = () => {
     const dispatch = useAppDispatch();
-    const players = useAppSelector(selectPlayers);
+    const statistics = useAppSelector(selectStatistics);
     const [playerStatistics, setPlayerStatistics] = useState<IPlayerStatistics>({
-        east: {
-            rounds: 0,
-            records: 0,
-            win: 0,
-            lose: 0,
-            selfDrawn: 0,
-            beSelfDrawn: 0,
-            draw: 0,
-            fake: 0,
-            amount: 0
-        },
-        south: {
-            rounds: 0,
-            records: 0,
-            win: 0,
-            lose: 0,
-            selfDrawn: 0,
-            beSelfDrawn: 0,
-            draw: 0,
-            fake: 0,
-            amount: 0
-        },
-        west: {
-            rounds: 0,
-            records: 0,
-            win: 0,
-            lose: 0,
-            selfDrawn: 0,
-            beSelfDrawn: 0,
-            draw: 0,
-            fake: 0,
-            amount: 0
-        },
-        north: {
-            rounds: 0,
-            records: 0,
-            win: 0,
-            lose: 0,
-            selfDrawn: 0,
-            beSelfDrawn: 0,
-            draw: 0,
-            fake: 0,
-            amount: 0
+        id: 0,
+        name: '',
+        createdAt: new Date(),
+        winds: {
+            east: {
+                round: 0,
+                record: 0,
+                win: 0,
+                lose: 0,
+                selfDrawn: 0,
+                beSelfDrawn: 0,
+                draw: 0,
+                fake: 0,
+                amount: 0
+            },
+            south: {
+                round: 0,
+                record: 0,
+                win: 0,
+                lose: 0,
+                selfDrawn: 0,
+                beSelfDrawn: 0,
+                draw: 0,
+                fake: 0,
+                amount: 0
+            },
+            west: {
+                round: 0,
+                record: 0,
+                win: 0,
+                lose: 0,
+                selfDrawn: 0,
+                beSelfDrawn: 0,
+                draw: 0,
+                fake: 0,
+                amount: 0
+            },
+            north: {
+                round: 0,
+                record: 0,
+                win: 0,
+                lose: 0,
+                selfDrawn: 0,
+                beSelfDrawn: 0,
+                draw: 0,
+                fake: 0,
+                amount: 0
+            },
         }
     });
 
     const data: IColumn[] = [
         {
             key: '將數',
-            total: Object.values(playerStatistics).reduce((p, c) => c.rounds),
-            east: playerStatistics.east.rounds,
-            south: playerStatistics.south.rounds,
-            west: playerStatistics.west.rounds,
-            north: playerStatistics.north.rounds,
+            total: [
+                playerStatistics.winds.east ? playerStatistics.winds.east.round : 0,
+                playerStatistics.winds.south ? playerStatistics.winds.south.round : 0,
+                playerStatistics.winds.west ? playerStatistics.winds.west.round : 0,
+                playerStatistics.winds.north ? playerStatistics.winds.north.round : 0,
+            ].reduce((acc, value) => acc + value, 0),
+            east: playerStatistics.winds.east ? playerStatistics.winds.east.round : 0,
+            south: playerStatistics.winds.south ? playerStatistics.winds.south.round : 0,
+            west: playerStatistics.winds.west ? playerStatistics.winds.west.round : 0,
+            north: playerStatistics.winds.north ? playerStatistics.winds.north.round : 0,
         },
         {
             key: '局數',
-            total: Object.values(playerStatistics).reduce((p, c) => c.records),
-            east: playerStatistics.east.records,
-            south: playerStatistics.south.records,
-            west: playerStatistics.west.records,
-            north: playerStatistics.north.records
+            total: [
+                playerStatistics.winds.east ? playerStatistics.winds.east.record : 0,
+                playerStatistics.winds.south ? playerStatistics.winds.south.record : 0,
+                playerStatistics.winds.west ? playerStatistics.winds.west.record : 0,
+                playerStatistics.winds.north ? playerStatistics.winds.north.record : 0,
+            ].reduce((acc, value) => acc + value, 0),
+            east: playerStatistics.winds.east ? playerStatistics.winds.east.record : 0,
+            south: playerStatistics.winds.south ? playerStatistics.winds.south.record : 0,
+            west: playerStatistics.winds.west ? playerStatistics.winds.west.record : 0,
+            north: playerStatistics.winds.north ? playerStatistics.winds.north.record : 0,
         },
         {
             key: '胡牌',
-            total: Object.values(playerStatistics).reduce((p, c) => c.wins),
-            east: playerStatistics.east.win,
-            south: playerStatistics.south.win,
-            west: playerStatistics.west.win,
-            north: playerStatistics.north.win,
+            total: [
+                playerStatistics.winds.east ? playerStatistics.winds.east.win : 0,
+                playerStatistics.winds.south ? playerStatistics.winds.south.win : 0,
+                playerStatistics.winds.west ? playerStatistics.winds.west.win : 0,
+                playerStatistics.winds.north ? playerStatistics.winds.north.win : 0,
+            ].reduce((acc, value) => acc + value, 0),
+            east: playerStatistics.winds.east ? playerStatistics.winds.east.win : 0,
+            south: playerStatistics.winds.south ? playerStatistics.winds.south.win : 0,
+            west: playerStatistics.winds.west ? playerStatistics.winds.west.win : 0,
+            north: playerStatistics.winds.north ? playerStatistics.winds.north.win : 0,
         },
         {
             key: '自摸',
-            total: Object.values(playerStatistics).reduce((p, c) => c.selfDrawns),
-            east: playerStatistics.east.selfDrawn,
-            south: playerStatistics.south.selfDrawn,
-            west: playerStatistics.west.selfDrawn,
-            north: playerStatistics.north.selfDrawn,
+            total: [
+                playerStatistics.winds.east ? playerStatistics.winds.east.selfDrawn : 0,
+                playerStatistics.winds.south ? playerStatistics.winds.south.selfDrawn : 0,
+                playerStatistics.winds.west ? playerStatistics.winds.west.selfDrawn : 0,
+                playerStatistics.winds.north ? playerStatistics.winds.north.selfDrawn : 0,
+            ].reduce((acc, value) => acc + value, 0),
+            east: playerStatistics.winds.east ? playerStatistics.winds.east.selfDrawn : 0,
+            south: playerStatistics.winds.south ? playerStatistics.winds.south.selfDrawn : 0,
+            west: playerStatistics.winds.west ? playerStatistics.winds.west.selfDrawn : 0,
+            north: playerStatistics.winds.north ? playerStatistics.winds.north.selfDrawn : 0,
         },
         {
             key: '放槍',
-            total: Object.values(playerStatistics).reduce((p, c) => c.loses),
-            east: playerStatistics.east.lose,
-            south: playerStatistics.south.lose,
-            west: playerStatistics.west.lose,
-            north: playerStatistics.north.lose
+            total: [
+                playerStatistics.winds.east ? playerStatistics.winds.east.lose : 0,
+                playerStatistics.winds.south ? playerStatistics.winds.south.lose : 0,
+                playerStatistics.winds.west ? playerStatistics.winds.west.lose : 0,
+                playerStatistics.winds.north ? playerStatistics.winds.north.lose : 0,
+            ].reduce((acc, value) => acc + value, 0),
+            east: playerStatistics.winds.east ? playerStatistics.winds.east.lose : 0,
+            south: playerStatistics.winds.south ? playerStatistics.winds.south.lose : 0,
+            west: playerStatistics.winds.west ? playerStatistics.winds.west.lose : 0,
+            north: playerStatistics.winds.north ? playerStatistics.winds.north.lose : 0,
         },
         {
             key: '被自摸',
-            total: Object.values(playerStatistics).reduce((p, c) => c.loses),
-            east: playerStatistics.east.beSelfDrawn,
-            south: playerStatistics.south.beSelfDrawn,
-            west: playerStatistics.west.beSelfDrawn,
-            north: playerStatistics.north.beSelfDrawn,
+            total: [
+                playerStatistics.winds.east ? playerStatistics.winds.east.beSelfDrawn : 0,
+                playerStatistics.winds.south ? playerStatistics.winds.south.beSelfDrawn : 0,
+                playerStatistics.winds.west ? playerStatistics.winds.west.beSelfDrawn : 0,
+                playerStatistics.winds.north ? playerStatistics.winds.north.beSelfDrawn : 0,
+            ].reduce((acc, value) => acc + value, 0),
+            east: playerStatistics.winds.east ? playerStatistics.winds.east.beSelfDrawn : 0,
+            south: playerStatistics.winds.south ? playerStatistics.winds.south.beSelfDrawn : 0,
+            west: playerStatistics.winds.west ? playerStatistics.winds.west.beSelfDrawn : 0,
+            north: playerStatistics.winds.north ? playerStatistics.winds.north.beSelfDrawn : 0,
+        },
+        {
+            key: '流局',
+            total: [
+                playerStatistics.winds.east ? playerStatistics.winds.east.draw : 0,
+                playerStatistics.winds.south ? playerStatistics.winds.south.draw : 0,
+                playerStatistics.winds.west ? playerStatistics.winds.west.draw : 0,
+                playerStatistics.winds.north ? playerStatistics.winds.north.draw : 0,
+            ].reduce((acc, value) => acc + value, 0),
+            east: playerStatistics.winds.east ? playerStatistics.winds.east.draw : 0,
+            south: playerStatistics.winds.south ? playerStatistics.winds.south.draw : 0,
+            west: playerStatistics.winds.west ? playerStatistics.winds.west.draw : 0,
+            north: playerStatistics.winds.north ? playerStatistics.winds.north.draw : 0,
+        },
+        {
+            key: '詐胡',
+            total: [
+                playerStatistics.winds.east ? playerStatistics.winds.east.fake : 0,
+                playerStatistics.winds.south ? playerStatistics.winds.south.fake : 0,
+                playerStatistics.winds.west ? playerStatistics.winds.west.fake : 0,
+                playerStatistics.winds.north ? playerStatistics.winds.north.fake : 0,
+            ].reduce((acc, value) => acc + value, 0),
+            east: playerStatistics.winds.east ? playerStatistics.winds.east.fake : 0,
+            south: playerStatistics.winds.south ? playerStatistics.winds.south.fake : 0,
+            west: playerStatistics.winds.west ? playerStatistics.winds.west.fake : 0,
+            north: playerStatistics.winds.north ? playerStatistics.winds.north.fake : 0,
         },
         {
             key: '小計',
-            total: 0,
-            east: playerStatistics.east.amount,
-            south: playerStatistics.south.amount,
-            west: playerStatistics.west.amount,
-            north: playerStatistics.north.amount,
+            total: [
+                playerStatistics.winds.east ? playerStatistics.winds.east.amount : 0,
+                playerStatistics.winds.south ? playerStatistics.winds.south.amount : 0,
+                playerStatistics.winds.west ? playerStatistics.winds.west.amount : 0,
+                playerStatistics.winds.north ? playerStatistics.winds.north.amount : 0,
+            ].reduce((acc, value) => acc + value, 0),
+            east: playerStatistics.winds.east ? playerStatistics.winds.east.amount : 0,
+            south: playerStatistics.winds.south ? playerStatistics.winds.south.amount : 0,
+            west: playerStatistics.winds.west ? playerStatistics.winds.west.amount : 0,
+            north: playerStatistics.winds.north ? playerStatistics.winds.north.amount : 0,
         }
     ];
 
     const onChange = async (value: string) => {
-        const { data } = (await getPlayer(value)).data;
-        console.log(data);
-        setPlayerStatistics(data);
+        setPlayerStatistics(statistics[value]);
     };
 
-    const selectOptions = players.map(player => {
-        return {
-            value: player.name,
-            label: player.name
-        };
-    });
+    const selectOptions = statistics ? Object.keys(statistics).map(player => ({ value: player, label: player })) : [];
 
     useEffect(() => {
-        dispatch(fetchPlayers());
+        dispatch(fetchStatistics());
     }, [dispatch]);
 
     return (
