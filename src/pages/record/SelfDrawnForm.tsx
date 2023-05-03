@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Form, Radio, RadioChangeEvent, Button, Input } from "antd";
+import React from "react";
+import { Form, Radio, Button, Input } from "antd";
 import { IPlayers } from "../interface";
 
 interface IProps {

@@ -46,7 +46,7 @@ const Round: React.FC = () => {
     console.log(statistics);
 
 
-    const playerSelectOptions = Object.keys(statistics).map(player => ({ value: player, label: player }));
+    const playerSelectOptions = statistics ? Object.keys(statistics).map(player => ({ value: player, label: player })) : [];
 
     const onEastChange = (value: string) => {
         if (form.getFieldValue('south') === value) form.setFieldValue('south', null);

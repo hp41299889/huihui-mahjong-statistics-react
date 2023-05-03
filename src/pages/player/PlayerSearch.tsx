@@ -226,7 +226,7 @@ const PlayerSearch: React.FC = () => {
         setPlayerStatistics(statistics[value]);
     };
 
-    const selectOptions = Object.keys(statistics).map(player => ({ value: player, label: player }));
+    const selectOptions = statistics ? Object.keys(statistics).map(player => ({ value: player, label: player })) : [];
 
     useEffect(() => {
         dispatch(fetchStatistics());
