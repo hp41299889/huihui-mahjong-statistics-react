@@ -6,6 +6,7 @@ import Base from "./layouts/Base";
 import Record from "./pages/record/Record";
 import Round from "./pages/round/Round";
 import Home from "./pages/Home";
+import RoundSearch from "pages/round/RoundSearch";
 
 const Router = () => {
     return (
@@ -17,6 +18,7 @@ const Router = () => {
                     <Route path='/player/search' element={<PlayerSearch />} />
                     <Route path='/players/search' element={<PlayersSearch />} />
                     <Route path='/round' element={<Round />} />
+                    <Route path='/round/search' element={<RoundSearch />} />
                     <Route path='/record' element={<Record />} />
                 </Route>
             </Routes>

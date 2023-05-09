@@ -14,8 +14,9 @@ import { EEndType, ERoundStatus } from "../enum";
 import { OEndType } from "../option";
 import { windLabelMap } from "../enumMap";
 import { useAppDispatch, useAppSelector } from "redux/hook";
-import { fetchRound, selectCurrentRound } from "redux/mahjong";
+import { fetchCurrentRound, selectCurrentRound } from "redux/mahjong";
 import { IPostRecord, deleteLastRecord, postRecord, postResetCurrentRound } from "apis/mahjong";
+import { IAddRecord } from "pages/interface";
 
 const { Text } = Typography;
 
@@ -45,7 +46,7 @@ const Record: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const currentRound = useAppSelector(selectCurrentRound);
-    const { status, round, circle, dealer, dealerCount, players, records, venue } = currentRound;
+    const { status, circle, dealer, dealerCount, players, records, venue } = currentRound;
 
     const isRoundEmpty = (status: ERoundStatus) => {
         return status === ERoundStatus.EMPTY;
@@ -81,7 +82,7 @@ const Record: React.FC = () => {
         )
     }, [currentRound]);
 
-    const recordsListDatas = records.map((record, index) => {
+    const recordsListData = (record: IAddRecord) => {
         const { circle, dealer, dealerCount, winner, losers, endType, point } = record;
         const winnerNode = <Tag color='cyan'>{winner}</Tag>;
         const loserNode = <Tag color='red'>{losers}</Tag>
@@ -106,14 +107,13 @@ const Record: React.FC = () => {
         };
         return (
             <List.Item style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                {index + 1}
                 <Divider type='vertical' />
                 <Tag color='blue'>{windLabelMap[circle]}風{windLabelMap[dealer]}局</Tag>
                 <Tag color='purple'>連{dealerCount}</Tag>
                 {event}
             </List.Item>
         );
-    });
+    };
 
     const showDeleteLastRecordModal = () => {
         setIsDeleteLastRecordModalOpen(true);
@@ -121,8 +121,8 @@ const Record: React.FC = () => {
 
     const onDeleteLastRecordModalOk = async () => {
         setIsDeleteLastRecordModalOpen(false);
-        await deleteLastRecord(round.uid);
-        dispatch(fetchRound());
+        await deleteLastRecord();
+        dispatch(fetchCurrentRound());
         setRecordSubmitDisabled(true);
     };
 
@@ -137,6 +137,7 @@ const Record: React.FC = () => {
     const onResetCurrentRoundModalOk = async () => {
         setIsResetCurrentRoundModalOpen(false);
         await postResetCurrentRound();
+        dispatch(fetchCurrentRound());
     };
 
     const onResetCurrentRoundModalCancel = () => {
@@ -188,10 +189,10 @@ const Record: React.FC = () => {
             transformedValue.winner = '';
             transformedValue.losers = [];
         };
-        await postRecord(round.uid, transformedValue)
+        await postRecord(transformedValue)
             .then(res => {
                 message.success(`新增Record成功`);
-                dispatch(fetchRound());
+                dispatch(fetchCurrentRound());
             })
             .catch(err => {
                 console.error(err);
@@ -201,7 +202,7 @@ const Record: React.FC = () => {
     };
 
     useEffect(() => {
-        dispatch(fetchRound())
+        dispatch(fetchCurrentRound())
             .then(async res => {
                 const { status } = res.payload;
                 if (status === ERoundStatus.EMPTY) {
@@ -289,7 +290,7 @@ const Record: React.FC = () => {
                             onCancel={onDeleteLastRecordModalCancel}
                         >
                             <div>確定要刪除以下紀錄嗎?</div>
-                            <div>{recordsListDatas[recordsListDatas.length - 1]}</div>
+                            <div>{recordsListData(records[records.length - 1])}</div>
                         </Modal>
                     </>
                 }
@@ -309,7 +310,7 @@ const Record: React.FC = () => {
                     </>
                 }
             </Space>
-            <RecordList recordsListDatas={recordsListDatas} />
+            <RecordList records={records} />
         </>
     )
 };

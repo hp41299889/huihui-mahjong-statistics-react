@@ -46,7 +46,7 @@ const columns: ColumnsType<IColumn> = [
         align: 'right'
     },
 ];
-//TODO 用redux
+
 const PlayerSearch: React.FC = () => {
     const dispatch = useAppDispatch();
     const statistics = useAppSelector(selectStatistics);

@@ -28,6 +28,10 @@ const items: MenuProps['items'] = [
     },
     {
         key: '5',
+        label: <Link to='/round/search'>搜尋將</Link>
+    },
+    {
+        key: '6',
         label: <Link to='/record'>新增一局</Link>
     },
 ];

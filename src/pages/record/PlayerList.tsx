@@ -5,7 +5,7 @@ import { EWind } from "../enum";
 import { ColumnsType } from "antd/es/table";
 import { deleteCurrentRound } from "apis/mahjong";
 import { useAppDispatch } from "redux/hook";
-import { fetchRound } from "redux/mahjong";
+import { fetchCurrentRound } from "redux/mahjong";
 
 const { Text } = Typography;
 
@@ -41,7 +41,7 @@ const PlayerList: React.FC<IProps> = (props) => {
     const onDeleteLastRecordModalOk = async () => {
         setIsDeleteCurrentRoundModal(false);
         await deleteCurrentRound();
-        await dispatch(fetchRound());
+        await dispatch(fetchCurrentRound());
     };
 
     const columns: ColumnsType<IColumn> = [
