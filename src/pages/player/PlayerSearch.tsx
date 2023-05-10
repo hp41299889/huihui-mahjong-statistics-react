@@ -245,10 +245,11 @@ const PlayerSearch: React.FC = () => {
                     </Form.Item>
                 </Form>
             </Col>
-
-            <Col span={24}>
-                <Table columns={columns} dataSource={data} size='small' pagination={false} />
-            </Col>
+            {playerStatistics.name &&
+                <Col span={24}>
+                    <Table columns={columns} dataSource={data} size='small' pagination={false} />
+                </Col>
+            }
         </Row>
     )
 };

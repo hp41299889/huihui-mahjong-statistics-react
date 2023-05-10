@@ -137,7 +137,7 @@ const Record: React.FC = () => {
     const onResetCurrentRoundModalOk = async () => {
         setIsResetCurrentRoundModalOpen(false);
         await postResetCurrentRound();
-        dispatch(fetchCurrentRound());
+        navigate('/round/create');
     };
 
     const onResetCurrentRoundModalCancel = () => {
@@ -206,7 +206,7 @@ const Record: React.FC = () => {
             .then(async res => {
                 const { status } = res.payload;
                 if (status === ERoundStatus.EMPTY) {
-                    navigate('/round');
+                    navigate('/round/create');
                 };
 
             })

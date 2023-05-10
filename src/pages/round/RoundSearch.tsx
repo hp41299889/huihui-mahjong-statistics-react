@@ -76,8 +76,6 @@ const RoundSearch: React.FC = () => {
         venue: []
     });
     const { east, south, west, north, records, venue } = selectedRound;
-    console.log(selectedRound);
-
 
     const columns: ColumnsType<IColumn> = [
         {
