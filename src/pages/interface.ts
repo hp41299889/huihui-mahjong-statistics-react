@@ -37,7 +37,7 @@ interface IPlayerScore {
     lose: number;
     selfDrawn: number;
     draw: number;
-    beSelfDrawn?: number;
+    beSelfDrawn: number;
     fake: number;
     amount: number;
 };
@@ -71,6 +71,24 @@ interface IWindStatistics {
     amount: number;
 };
 
+export interface IHistory {
+    [key: string]: IHistoryRound[];
+};
+
+export interface IHistoryRound {
+    uid: string;
+    createdAt: Date;
+    deskType: EDeskType;
+    base: number;
+    point: number;
+    east: IPlayerScore;
+    south: IPlayerScore;
+    west: IPlayerScore;
+    north: IPlayerScore;
+    records: IAddRecord[];
+    venue: IAddRecord[];
+};
+
 //base
 export interface IPlayer {
     id?: number;
@@ -85,12 +103,10 @@ export interface IPlayer {
     amount: number;
 };
 
-
-
-interface IRound {
+export interface IRound {
     //generate
     uid: string;
-    createdAt: Date | String;
+    createdAt: Date | string;
     //column
     deskType: EDeskType;
     base: number;
@@ -103,7 +119,6 @@ interface IRound {
     records: IRecord[];
     // updatedAt: Date;
 };
-
 
 interface IRecord {
     //generate
@@ -119,8 +134,6 @@ interface IRecord {
     winner: IPlayer;
     losers: IPlayer[];
 };
-
-
 
 export interface IEndTypeOption {
     label: string;

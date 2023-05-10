@@ -1,8 +1,11 @@
-import React from "react";
-import { Typography, Table, } from "antd";
+import React, { useState } from "react";
+import { Typography, Table, Button, Modal, } from "antd";
 import { ICurrentRound } from "../interface";
 import { EWind } from "../enum";
 import { ColumnsType } from "antd/es/table";
+import { deleteCurrentRound } from "apis/mahjong";
+import { useAppDispatch } from "redux/hook";
+import { fetchCurrentRound } from "redux/mahjong";
 
 const { Text } = Typography;
 
@@ -23,12 +26,44 @@ interface IColumn {
 const PlayerList: React.FC<IProps> = (props) => {
     const { currentRound } = props;
     const { east, south, west, north } = currentRound.players;
+    const [isDeleteCurrentRoundModal, setIsDeleteCurrentRoundModal] = useState<boolean>(false);
+
+    const dispatch = useAppDispatch();
+
+    const showDeleteCurrentRoundModal = () => {
+        setIsDeleteCurrentRoundModal(true);
+    };
+
+    const onDeleteLastRecordModalCancel = () => {
+        setIsDeleteCurrentRoundModal(false);
+    };
+
+    const onDeleteLastRecordModalOk = async () => {
+        setIsDeleteCurrentRoundModal(false);
+        await deleteCurrentRound();
+        await dispatch(fetchCurrentRound());
+    };
 
     const columns: ColumnsType<IColumn> = [
         {
-            title: '',
+            title: <>
+                <Button
+                    type='primary'
+                    danger
+                    onClick={showDeleteCurrentRoundModal}
+                >
+                    刪除這將
+                </Button>
+                <Modal
+                    title='刪除這將'
+                    open={isDeleteCurrentRoundModal}
+                    onOk={onDeleteLastRecordModalOk}
+                    onCancel={onDeleteLastRecordModalCancel}
+                />
+            </>,
             dataIndex: 'key',
-            rowScope: 'row'
+            rowScope: 'row',
+            width: 80
         },
         {
             key: 'playerList_column_win',

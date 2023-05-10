@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
 
 import { EDeskType, ERoundStatus } from "pages/enum";
-import { useAppDispatch, useAppSelector } from "redux/hook";
-import { fetchStatistics, fetchRound, selectStatistics } from "redux/mahjong";
-import { postRound } from "apis/mahjong";
+import { useAppDispatch } from "redux/hook";
+import { fetchCurrentRound, } from "redux/mahjong";
+import { getAllPlayers, postRound } from "apis/mahjong";
+import { IPlayer } from "pages/interface";
 
 const breadcrumbItems: ItemType[] = [
     {
@@ -38,13 +39,13 @@ interface IFormValue {
 
 const Round: React.FC = () => {
     const [form] = Form.useForm();
+    const [players, setPlayers] = useState<IPlayer[]>([]);
     const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
 
     const dispatch = useAppDispatch();
-    const statistics = useAppSelector(selectStatistics);
     const navigate = useNavigate();
 
-    const playerSelectOptions = statistics ? Object.keys(statistics).map(player => ({ value: player, label: player })) : [];
+    const playerSelectOptions = players.map(player => ({ value: player.name, label: player.name }));
 
     const onEastChange = (value: string) => {
         if (form.getFieldValue('south') === value) form.setFieldValue('south', null);
@@ -89,13 +90,17 @@ const Round: React.FC = () => {
     };
 
     useEffect(() => {
-        dispatch(fetchRound())
+        dispatch(fetchCurrentRound())
             .then(res => {
                 const { status } = res.payload;
                 if (status === ERoundStatus.IN_PROGRESS || status === ERoundStatus.END) {
                     navigate('/record');
                 } else {
-                    dispatch(fetchStatistics());
+                    getAllPlayers()
+                        .then(res => {
+                            const { data } = res.data;
+                            setPlayers(data);
+                        });
                 };
             });
     }, [dispatch, navigate]);
