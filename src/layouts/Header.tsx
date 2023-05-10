@@ -1,35 +1,63 @@
 import React from "react";
 import { Button, Dropdown, Layout, Typography } from "antd";
-import { MenuOutlined } from '@ant-design/icons';
+import { FolderAddOutlined, HomeOutlined, MenuOutlined, SaveOutlined, SearchOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Link } from "react-router-dom";
 
 
 const items: MenuProps['items'] = [
     {
-        key: '0',
-        label: <Link to='/'>首頁</Link>
+        key: '1',
+        label: <Link to='/'><HomeOutlined /> 首頁</Link>
     },
     {
-        key: '1',
-        label: <Link to='/player/create'>新增玩家</Link>
+        type: 'divider'
     },
     {
         key: '2',
-        label: <Link to='/player/search'>搜尋玩家</Link>
+        type: 'group',
+        label: '玩家',
+        children: [
+            {
+                key: '2-1',
+                label: <Link to='/player/create'><UserAddOutlined /> 新增玩家</Link>
+            },
+            {
+                key: '2-2',
+                label: <Link to='/player/search'><UserOutlined /> 搜尋玩家</Link>
+            },
+            {
+                key: '2-3',
+                label: <Link to='/players/search'>搜尋玩家(未完成)</Link>
+            },
+        ]
     },
     {
         key: '3',
-        label: <Link to='/players/search'>搜尋玩家s</Link>
+        type: 'group',
+        label: '將',
+        children: [
+            {
+                key: '3-1',
+                label: <Link to='/round/create'><FolderAddOutlined /> 新增將</Link>
+            },
+            {
+                key: '3-2',
+                label: <Link to='/round/search'><SearchOutlined /> 搜尋將</Link>
+            },
+        ]
     },
     {
         key: '4',
-        label: <Link to='/round'>新增一將</Link>
-    },
-    {
-        key: '5',
-        label: <Link to='/record'>新增一局</Link>
-    },
+        type: 'group',
+        label: '局',
+        children: [
+            {
+                key: '4-1',
+                label: <Link to='/record'><SaveOutlined /> 新增局</Link>
+            }
+        ]
+    }
 ];
 
 const Header: React.FC = () => {

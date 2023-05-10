@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from './store';
-import { getPlayerStatistics, getRound } from 'apis/mahjong';
+import { getPlayerStatistics, getCurrentRound } from 'apis/mahjong';
 import { ICurrentRound, IStatistics } from 'pages/interface';
 import { EDeskType, ERoundStatus, EWind } from 'pages/enum';
 
@@ -72,13 +72,13 @@ const initialState: IMahjong = {
         dealerCount: 0,
         venue: []
     },
-    statistics: {}
-}
+    statistics: {},
+};
 
-export const fetchRound = createAsyncThunk(
-    '/mahjong/fetchRound',
+export const fetchCurrentRound = createAsyncThunk(
+    '/mahjong/fetchCurrentRound',
     async () => {
-        return (await getRound()).data.data;
+        return (await getCurrentRound()).data.data;
     }
 );
 
@@ -99,7 +99,7 @@ export const slice = createSlice({
             .addCase(fetchStatistics.fulfilled, (state, action) => {
                 state.statistics = action.payload;
             })
-            .addCase(fetchRound.fulfilled, (state, action) => {
+            .addCase(fetchCurrentRound.fulfilled, (state, action) => {
                 state.currentRound = action.payload;
             })
     }

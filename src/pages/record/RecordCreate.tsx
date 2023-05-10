@@ -9,12 +9,14 @@ import DrawForm from "./DrawForm";
 import FakeForm from "./FakeForm";
 import { useNavigate } from "react-router-dom";
 import PlayerList from "./PlayerList";
+import RecordList from "./RecordList";
 import { EEndType, ERoundStatus } from "../enum";
 import { OEndType } from "../option";
 import { windLabelMap } from "../enumMap";
 import { useAppDispatch, useAppSelector } from "redux/hook";
-import { fetchRound, selectCurrentRound } from "redux/mahjong";
+import { fetchCurrentRound, selectCurrentRound } from "redux/mahjong";
 import { IPostRecord, deleteLastRecord, postRecord, postResetCurrentRound } from "apis/mahjong";
+import { IAddRecord } from "pages/interface";
 
 const { Text } = Typography;
 
@@ -34,19 +36,17 @@ interface IRecordForm {
     point: string;
 };
 
-//TODO 整理前後端API格式，應該不需要送風圈風局和連莊，已經在後端計算
-//TODO 切換endtype時可能要重置選項
 const Record: React.FC = () => {
     const [form] = Form.useForm();
     const [endType, setEndType] = useState<EEndType>(EEndType.WINNING);
     const [recordSubmitDisabled, setRecordSubmitDisabled] = useState<boolean>(true);
-    const [isDeleteLastRecordModalOpen, setIsDeleteLastRecordModalOpen] = useState(false);
-    const [isResetCurrentRoundModalOpen, setIsResetCurrentRoundModalOpen] = useState(false);
+    const [isDeleteLastRecordModalOpen, setIsDeleteLastRecordModalOpen] = useState<boolean>(false);
+    const [isResetCurrentRoundModalOpen, setIsResetCurrentRoundModalOpen] = useState<boolean>(false);
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const currentRound = useAppSelector(selectCurrentRound);
-    const { status, round, circle, dealer, dealerCount, players, records, venue } = currentRound;
+    const { status, circle, dealer, dealerCount, players, records, venue } = currentRound;
 
     const isRoundEmpty = (status: ERoundStatus) => {
         return status === ERoundStatus.EMPTY;
@@ -66,10 +66,10 @@ const Record: React.FC = () => {
     };
 
     const renderVenue = venue.map((record, index) => {
-        const { circle, dealer, dealerCount, winner, } = record;
+        const { winner } = record;
         return (
             <Tag key={`venueTag_${index}`} color='blue'>
-                {windLabelMap[circle]}風{windLabelMap[dealer]}局連{dealerCount}{winner}
+                {index + 1}. {winner}
             </Tag>
         )
     });
@@ -82,19 +82,19 @@ const Record: React.FC = () => {
         )
     }, [currentRound]);
 
-    const recordsListDatas = records.map((record, index) => {
+    const recordsListData = (record: IAddRecord) => {
         const { circle, dealer, dealerCount, winner, losers, endType, point } = record;
         const winnerNode = <Tag color='cyan'>{winner}</Tag>;
-        const loserNode = <Tag color='magenta'>{losers}</Tag>
-        const pointNode = <Tag color='orange'>{point}台</Tag>
+        const loserNode = <Tag color='red'>{losers}</Tag>
+        const pointNode = <Tag color='magenta'>{point}台</Tag>
         let event: React.ReactNode;
         switch (endType) {
             case EEndType.WINNING: {
-                event = <>{winnerNode}<Tag color='volcano'>胡</Tag>{loserNode}{pointNode}</>;
+                event = <>{winnerNode}<Tag color='orange'>胡</Tag>{loserNode}{pointNode}</>;
                 break;
             }
             case EEndType.SELF_DRAWN: {
-                event = <>{winnerNode}<Tag color='volcano'>自摸</Tag>{pointNode}</>;
+                event = <>{winnerNode}<Tag color='purple'>自摸</Tag>{pointNode}</>;
                 break;
             }
             case EEndType.DRAW: {
@@ -107,14 +107,13 @@ const Record: React.FC = () => {
         };
         return (
             <List.Item style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                {index + 1}
                 <Divider type='vertical' />
                 <Tag color='blue'>{windLabelMap[circle]}風{windLabelMap[dealer]}局</Tag>
                 <Tag color='purple'>連{dealerCount}</Tag>
                 {event}
             </List.Item>
         );
-    });
+    };
 
     const showDeleteLastRecordModal = () => {
         setIsDeleteLastRecordModalOpen(true);
@@ -122,8 +121,8 @@ const Record: React.FC = () => {
 
     const onDeleteLastRecordModalOk = async () => {
         setIsDeleteLastRecordModalOpen(false);
-        await deleteLastRecord(round.uid);
-        dispatch(fetchRound());
+        await deleteLastRecord();
+        dispatch(fetchCurrentRound());
         setRecordSubmitDisabled(true);
     };
 
@@ -138,6 +137,7 @@ const Record: React.FC = () => {
     const onResetCurrentRoundModalOk = async () => {
         setIsResetCurrentRoundModalOpen(false);
         await postResetCurrentRound();
+        navigate('/round/create');
     };
 
     const onResetCurrentRoundModalCancel = () => {
@@ -189,10 +189,10 @@ const Record: React.FC = () => {
             transformedValue.winner = '';
             transformedValue.losers = [];
         };
-        await postRecord(round.uid, transformedValue)
+        await postRecord(transformedValue)
             .then(res => {
                 message.success(`新增Record成功`);
-                dispatch(fetchRound());
+                dispatch(fetchCurrentRound());
             })
             .catch(err => {
                 console.error(err);
@@ -202,11 +202,11 @@ const Record: React.FC = () => {
     };
 
     useEffect(() => {
-        dispatch(fetchRound())
+        dispatch(fetchCurrentRound())
             .then(async res => {
                 const { status } = res.payload;
                 if (status === ERoundStatus.EMPTY) {
-                    navigate('/round');
+                    navigate('/round/create');
                 };
 
             })
@@ -275,6 +275,7 @@ const Record: React.FC = () => {
                     </Form>
                 </>
             }
+
             <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
                 {
                     status !== ERoundStatus.EMPTY && records.length > 0 &&
@@ -283,38 +284,33 @@ const Record: React.FC = () => {
                             刪除上一筆
                         </Button>
                         <Modal
-                            title='刪除Record'
+                            title='刪除紀錄'
                             open={isDeleteLastRecordModalOpen}
                             onOk={onDeleteLastRecordModalOk}
                             onCancel={onDeleteLastRecordModalCancel}
                         >
-                            <p>確定要刪除以下Record嗎?</p>
-                            <p>{recordsListDatas[0]}</p>
+                            <div>確定要刪除以下紀錄嗎?</div>
+                            <div>{recordsListData(records[records.length - 1])}</div>
                         </Modal>
                     </>
                 }
                 {status === ERoundStatus.END &&
                     <>
                         <Button type='primary' onClick={showResetCurrentRoundModal}>
-                            重置Round
+                            儲存並重置
                         </Button>
                         <Modal
-                            title='重置Round'
+                            title='儲存並重置'
                             open={isResetCurrentRoundModalOpen}
                             onOk={onResetCurrentRoundModalOk}
                             onCancel={onResetCurrentRoundModalCancel}
                         >
-                            確定要重置嗎?
+                            確定要儲存並重置嗎?
                         </Modal>
                     </>
                 }
             </Space>
-            <List
-                size='small'
-                dataSource={recordsListDatas}
-                bordered
-                renderItem={(item, index) => item}
-            />
+            <RecordList records={records} />
         </>
     )
 };

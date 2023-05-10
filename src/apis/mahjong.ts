@@ -27,7 +27,7 @@ export const postPlayer = async (data: IPostPlayer) => {
     return await mahjongApi.post('/player', data)
 };
 
-export const getPlayers = async () => {
+export const getAllPlayers = async () => {
     return await mahjongApi.get('/player');
 };
 
@@ -35,24 +35,36 @@ export const getPlayerStatistics = async () => {
     return await mahjongApi.get('/player/statistics');
 };
 
-//round
-export const getRound = async () => {
-    return await mahjongApi.get('/round');
+//record
+export const postRecord = async (data: IPostRecord) => {
+    return await mahjongApi.post('/record', data);
 };
 
+export const deleteLastRecord = async () => {
+    return await mahjongApi.delete('/record');
+};
+
+//round
 export const postRound = async (data: IPostRound) => {
     return await mahjongApi.post('/round', data);
 };
 
 export const postResetCurrentRound = async () => {
-    return await mahjongApi.post('/round/reset');
+    return await mahjongApi.post('/round/currentRound');
 };
 
-//record
-export const postRecord = async (roundUid: string, data: IPostRecord) => {
-    return await mahjongApi.post(`/record/${roundUid}`, data);
+export const getHistoryByDate = async (date: string) => {
+    return await mahjongApi.get(`/round/history/${date}`);
 };
 
-export const deleteLastRecord = async (roundUid: string) => {
-    return await mahjongApi.delete(`/record/${roundUid}`);
+export const getCurrentRound = async () => {
+    return await mahjongApi.get('/round/currentRound');
+};
+
+export const getExistDate = async () => {
+    return await mahjongApi.get('/round/history/existDates');
+};
+
+export const deleteCurrentRound = async () => {
+    return await mahjongApi.delete('/round/currentRound');
 };
