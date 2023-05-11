@@ -31,3 +31,5 @@ jobs:
 
       - name: Build
         run: yarn build
+        env:
+          REACT_APP_HUIHUI_MAHJONG_API_BASE_URL: ${{ secrets.REACT_APP_HUIHUI_MAHJONG_API_BASE_URL }}
