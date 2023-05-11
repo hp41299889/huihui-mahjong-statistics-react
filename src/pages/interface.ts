@@ -60,6 +60,7 @@ export interface IPlayerStatistics {
 };
 
 interface IWindStatistics {
+    [key: string]: number;
     round: number;
     record: number;
     win: number;
